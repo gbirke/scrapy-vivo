@@ -1,0 +1,11 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore generated RDF files
+*.n3
+
+# Ignore Vagrant VM data
+.vagrant
+
+# Ignore Database of IDs
+url_ids.db
