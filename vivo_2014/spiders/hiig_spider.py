@@ -12,12 +12,16 @@ class HiigSpider(Spider):
     allowed_domains = ["www.hiig.de"]
     start_urls = [
         "http://www.hiig.de/institute/organisation/",
-        "http://www.hiig.de/personen/"
+        "http://www.hiig.de/personen/",
+        "http://www.hiig.de/ausgewahlte-publikationen/"
     ]
 
     def parse(self, response):
         if response.url.find("organisation") > -1:
             return self.parse_organization(response)
+        if response.url.find("publi") > -1:
+            for item in self.parse_publications(response):
+                yield item
         else:
             return self.parse_overview(response)
 
@@ -69,3 +73,9 @@ class HiigSpider(Spider):
                 person["web"] = href
 
         yield person
+
+    def parse_publications(response):
+        sel = Selector(response)
+        for pub_content in sel.css("#content .publication-APA"):
+            autoren_und_titel = pub_content.xpath("text()").extract()[0]
+            # TODO: Autoren und Titel aufteilen, em parsen (Quelle), Publikationsjahr, etc.
