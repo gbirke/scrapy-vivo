@@ -20,8 +20,7 @@ class HiigSpider(Spider):
         if response.url.find("organisation") > -1:
             return self.parse_organization(response)
         if response.url.find("publi") > -1:
-            for item in self.parse_publications(response):
-                yield item
+            return self.parse_publications(response):
         else:
             return self.parse_overview(response)
 
