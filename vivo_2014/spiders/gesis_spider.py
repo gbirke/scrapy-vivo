@@ -16,7 +16,7 @@ class GesisSpider(Spider):
     allowed_domains = ["www.gesis.org"]
     start_urls = [
         "http://www.gesis.org/forschung/angewandte-informatik-und-informationswissenschaft/",
-        "http://www.gesis.org/das-institut/"
+        "http://www.gesis.org/das-institut/adresse-und-anreise/standort-koeln/"
         #"http://www.gesis.org/en/research/applied-computer-and-information-science/data-mining-und-knowledge-discovery/"
     ]
 
@@ -31,12 +31,11 @@ class GesisSpider(Spider):
         self.log("Parsing Organization")
         orga = Organization()
         sel = Selector(response)
-        name = join(sel.css("#main #col3 .csc-default h1::text").extract(), "")
         orga["source_url"] = response.url
-        orga["name"] = name
+        orga["name"] = u"GESIS - Leibniz-Institut f\xfcr Sozialwissenschaften"
         self.organization = orga
 
-        # TODO Kölner Standort
+        # TODO Koelner Standort
 
         yield orga
 

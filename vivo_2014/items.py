@@ -63,7 +63,8 @@ class Organization(Item):
     street_address = Field()
     postal_code = Field()
     city = Field() 
-    country = Field()   
+    country = Field()
+    email = Field()   
 
 class Publication(Item):
     id = Field()

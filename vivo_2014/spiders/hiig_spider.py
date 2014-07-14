@@ -53,8 +53,8 @@ class HiigSpider(Spider):
         else:
             person["name"] = name_full
 
-        # TODO Department und DepartmentRole statt position, wenn position einen Doppelpunkt enthält
-        # Damit die Departments eindeutig sind und nicht mehrfach erzeugt werden, als source_url für Department
+        # TODO Department und DepartmentRole statt position, wenn position einen Doppelpunkt enthaelt
+        # Damit die Departments eindeutig sind und nicht mehrfach erzeugt werden, als source_url fuer Department
         # http://www.hiig.de/institute/organisation/#Department_Name verwenden.
         # Es muss dann noch ein Pipeline-Filter geschrieben werden, der Departments mit der gleichen source_url
         # aussortiert! 

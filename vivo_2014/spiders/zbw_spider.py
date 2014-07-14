@@ -11,7 +11,7 @@ class ZbwSpider(Spider):
     name = "zbw_spider"
     allowed_domains = ["www.zbw.eu"]
     start_urls = [
-        "http://www.zbw.eu/de/forschung/",
+       # "http://www.zbw.eu/de/forschung/",
         "http://www.zbw.eu/de/impressum/"
     ]
 
@@ -30,7 +30,15 @@ class ZbwSpider(Spider):
         orga["name"] = strip(names[0]) # ignore text following the <br>
 
         # TODO parse address data
-        
+        address = content.xpath("p[2]/text()").extract()
+        orga["street_address"]= strip(address[0])
+        orga["postal_code"]= strip(address[1]).split(" ")[0]
+        orga["city"]= strip(address[1]).split(" ")[1]
+        contact = content.xpath("p[3]/text()").extract()
+        orga["phone"]= re.search("[-+0-9]+",strip(contact[0])).group(0)
+        orga["fax"]= re.search("[-+0-9]+",strip(contact[1])).group(0)
+        mail = content.xpath("p[3]/a/text()").extract()
+        orga["email"] = join(mail,"")
         yield orga
 
     def parse_overview(self, response):
