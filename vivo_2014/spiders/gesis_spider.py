@@ -35,7 +35,14 @@ class GesisSpider(Spider):
         orga["name"] = u"GESIS - Leibniz-Institut f\xfcr Sozialwissenschaften"
         self.organization = orga
 
-        # TODO Koelner Standort
+        content = sel.css("#col3 .csc-default")
+        address = content.xpath("p[1]/text()").extract()
+        orga["street_address"]= strip(address[0])
+        orga["postal_code"]= strip(address[1]).split(" ")[0]
+        orga["city"]= strip(address[1]).split(" ")[1]
+        contact = content.xpath("p[2]/text()").extract()
+        orga["phone"]= re.search("[-+0-9() ]+",strip(contact[0])).group(0)
+        orga["fax"]= re.search("[-+0-9() ]+",strip(contact[1])).group(0)
 
         yield orga
 
