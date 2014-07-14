@@ -2,8 +2,52 @@
 
 Dieses Projekt durchsucht Webseiten des Science 2.0 Forschungsverbundes nach Daten über Personen, Organisationen und Publikationen und exportiert diese Daten in RDF, das von [VIVO][1] gelesen werden kann. Dazu wird das Python-Scraping Framework [Scrapy][2] verwendet.
 
-## Installation
-TODO
+## Verwendung
+### Installation
+Installieren Sie die VirtualBox-Datei `SCRAPY.OVA` in VirtualBox über das Menü "Datei -> Appliance importieren ...". Starten Sie die virtuelle Maschine.
+
+Danach können Sie sich mit [Putty][5] auf die Kommandozeile der virtuellen Maschine verbinden. Port ist `2222`, Benutzername und Passwort sind `vagrant`.
+
+### Gemeinsamen Ordner einrichten
+Wenn Sie die Scraper-Dateien mit einem Editor auf ihrem PC berabeiten wollen, schalten Sie die Virtuelle Maschine aus und richten Sie einen gemeinsamen Ordner ein. Als Name auf der Maschine verwenden Sie am besten `media/scrapy`. 
+
+Starten Sie die virtuelle Maschine und kopieren Sie die Scrapy-Dateien auf der Kommandozeile mit folgendem Befehl:
+
+    cp -r /usr/local/vivo2014/* /media/scrapy
+
+Verwenden Sie in den folgenden Schritten den Ordner `/media/scrapy` an Stelle von `/usr/local/vivo2014`.
+
+
+### Scraper aufrufen
+Wechseln Sie auf der Kommandozeile in den Ordner `/usr/local/vivo2014` mit folgendem Befehl:
+
+    cd /usr/local/vivo2014
+
+Rufen Sie dann die zur Seite passende Spider auf, z.B.
+
+    scrapy crawl zbw_spider
+
+Weitere gültige Spider-Namen sind `hiig_spider` und `gesis_spider`.
+
+### Speichern der Änderungen mit git
+
+Wechseln Sie auf der Kommandozeile in den Ordner `/usr/local/vivo2014` mit folgendem Befehl:
+
+    cd /usr/local/vivo2014
+
+Holen Sie sich die neueste Version vom Server mit
+
+    git pull
+
+Wenn Sie einen Scraper geändert haben (auch wenn es nur ein funktionierender Zwischenstand ist), speichern Sie ihn ab mit
+
+    git commit -a -m "Beschreibung der Änderungen"
+
+Beschreiben Sie kurz auf englisch was geändert wurde und stellen Sie den Namen der Spider voran, z.B. "[ZBW] Add email to organization" oder "[HIIG] parse publication author".
+
+Um die Änderungen auf den Server zu überspielen, geben Sie folgenden Befehl ein:
+
+    git push
 
 ## Konzepte
 Um die Daten einer Webseite zu speichern, benötigt Scrapy zunächst eine Datenstruktur, in der die Daten gespeichert werden sollen. Diese Datenstruktur heißt **Item**. Die verschiedenen Typen von Items sind in der Datei `items.py` gespeichert.
@@ -48,6 +92,9 @@ def parse_person_details(self, response):
     # ...
 ```
 
+### Mehrere Items verarbeiten
+TODO: for-Schleife erklären mit Beispiel
+
 ## Nachbearbeitung der Items in der Pipeline
 ### Vergeben von IDs
 ### RDF-Export
@@ -56,3 +103,4 @@ def parse_person_details(self, response):
 [2]: http://doc.scrapy.org/en/latest/
 [3]: http://de.wikipedia.org/wiki/XPath
 [4]: http://de.wikipedia.org/wiki/Cascading_Style_Sheets#Selektoren
+[5]: http://www.putty.org/
