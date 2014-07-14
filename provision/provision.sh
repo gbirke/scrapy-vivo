@@ -2,14 +2,24 @@
 
 apt-get update
 
-apt-get -y install python python-pip
+# Install dependencies for python libraries
+apt-get -y install build-essential libssl-dev libffi-dev libxml2 libxml2-dev libxslt-dev
 
+# Install python and PIP
+apt-get -y install python python-dev python-pip
+
+# install version control programs
 apt-get -y install subversion git
 
-cd /media/vivo_2014
+VIVO_DIR=/usr/local/vivo2014
 
-#svn checkout https://sysadmin.tib.uni-hannover.de/svn/opensciencelab/vivo-scrapy/trunk/vivo_2014 .
+mkdir -p $VIVO_DIR
+chown vagrant:vagrant $VIVO_DIR
+cd $VIVO_DIR
 
-pip install -r requirements.txt
+# Folgende Befehle wg. fehlendem SSH-key müssen manuell ausgeführt werden
+
+#git clone git@github.com:gbirke/scrapy-vivo.git .
+#pip install -r requirements.txt
 
 
