@@ -91,7 +91,25 @@ def parse_person_details(self, response):
 ```
 
 ### Mehrere Items verarbeiten
-TODO: for-Schleife erklären mit Beispiel
+Wenn auf einer Seite mehrere Items zu verarbeiten sind, müssen Sie eine `for`-Schleife benutzen. Das folgende Beispiel zeigt, wie Sie
+
+- einen CSS-Selektor-Ausdruck, der mehrere Elemente zurückliefert, mit einer `for`-Schleife durchlaufen
+- für jedes Element ein neues Item erzeugen (in diesem Fall eine Publikation)
+- aus dem aktuellen Element Informationen extrahieren
+- Informationen an die aktuelle URL anfügen, um als sie als eindeutige `source_url` für das Item benutzen zu können.
+- das Item mit `yield` zurückliefern
+
+```python
+def parse_publications(self, response):
+    sel = Selector(response)
+    for pub_content in sel.css("#main ul.publications li"):
+        publi = Publication()
+        title = join(pub_content.xpath("span[1]/text()").extract(), "")
+        publi["source_url"] = response.url + "#" + title
+        publi["title"] = title
+        publi["author"] = join(pub_content.xpath("span[2]/text()").extract(), "")
+        yield publi
+```
 
 ## Nachbearbeitung der Items in der Pipeline
 ### Vergeben von IDs
