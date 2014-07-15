@@ -17,7 +17,7 @@ Starten Sie die virtuelle Maschine und kopieren Sie die Scrapy-Dateien auf der K
 
 
 ### Scraper aufrufen
-Wechseln Sie auf der Kommandozeile in den Ordner `/usr/local/vivo2014` mit folgendem Befehl:
+Wechseln Sie auf der Kommandozeile in den Ordner `/media/sf_scrapy` mit folgendem Befehl:
 
     cd /media/sf_scrapy
 
@@ -29,7 +29,7 @@ Weitere gültige Spider-Namen sind `hiig_spider` und `gesis_spider`.
 
 ### Speichern der Änderungen mit git
 
-Wechseln Sie auf der Kommandozeile in den Ordner `/usr/local/vivo2014` mit folgendem Befehl:
+Wechseln Sie auf der Kommandozeile in den Ordner `/media/sf_scrapy` mit folgendem Befehl:
 
     cd /media/sf_scrapy
 
