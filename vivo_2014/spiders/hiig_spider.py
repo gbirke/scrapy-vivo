@@ -1,9 +1,9 @@
-from string import join
+from string import join,split
 from scrapy.spider import Spider
 from scrapy.selector import Selector
 from scrapy.http import Request
 
-from vivo_2014.items import Person, Organization
+from vivo_2014.items import Person, Organization, Publication, Lecture, Event
 
 import re
 
@@ -11,8 +11,8 @@ class HiigSpider(Spider):
     name = "hiig_spider"
     allowed_domains = ["www.hiig.de"]
     start_urls = [
-        "http://www.hiig.de/institute/organisation/",
-        "http://www.hiig.de/personen/",
+        #"http://www.hiig.de/institute/organisation/",
+        #"http://www.hiig.de/personen/",
         "http://www.hiig.de/ausgewahlte-publikationen/"
     ]
 
@@ -79,15 +79,19 @@ class HiigSpider(Spider):
         for pub_content in sel.css("#content .publication-APA"):
             public = Publication()
             public["source_url"] = response.url
-            autoren_und_titel = pub_content.xpath("text()").extract()[0]
+            pub_content_texte = pub_content.xpath("text()").extract()
+            autoren_und_titel = pub_content_texte[0]
             autoren = split(autoren_und_titel, "(")[0]#zerlegt autoren_und_titel mit der "("(sollen 2 Teile sein)
-            autor = re.split("(.,|&) *",autoren)#in der Schleife muss sein
+            author = re.split("(\.,|&) *",autoren)#in der Schleife muss sein
             public["author_names"] = author
             #re.search("([\w]+),",autor[0]).group(1)#Folge von Buchstaben (Ziffern) vor dem Komma
             #mindestens 1 Mal wiederholt
             #public["afname"] = re.search(", (\w{1})",autor[0]).group(1)#sucht nach einem Wortzeichen nach ", "
-            public["year"] = re.search("([0-9]{4})\)",split(autoren_und_titel[1], "(").group(1)#sucht nach einer Folge von 4 Ziffern vor dem Klammer
+            jahreszahl_und_titel = split(autoren_und_titel, "(")[1]
+            year_match = re.search("([0-9]{4})\)", jahreszahl_und_titel)
+            if year_match:
+                public["year"] = year_match.group(1)#sucht nach einer Folge von 4 Ziffern vor dem Klammer
             source = pub_content.xpath("em/text()").extract()
             public["source"] = source
-            # TODO: Autoren und Titel aufteilen, em parsen (Quelle), Publikationsjahr, etc.
+            # TODO: Titel aufteilen, em parsen (Quelle), Publikationsjahr, etc.
             yield public
