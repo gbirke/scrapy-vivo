@@ -72,6 +72,8 @@ class Publication(Item):
     title = Field()
     publication_date = Field()
     author_ids = Field() # Liste der Autoren (Personen-IDs)
+    asurname = Field() #Autorname
+    afname = Field() #Autorvorname
     year = Field()
     publication_location = Field()
     publisher = Field()
@@ -80,6 +82,7 @@ class Publication(Item):
     volume = Field()
     phrases = Field() # Schlagwoerter
     thesis_type = Field() #fuer die Hochschulschriften
+    series = Field() #Serie
 
 # Fuer Vortraege s. Know Center
 class Lecture(Item):
