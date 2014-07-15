@@ -6,22 +6,20 @@ Dieses Projekt durchsucht Webseiten des Science 2.0 Forschungsverbundes nach Dat
 ### Installation
 Installieren Sie die VirtualBox-Datei `SCRAPY.OVA` in VirtualBox über das Menü "Datei -> Appliance importieren ...". Starten Sie die virtuelle Maschine.
 
-Danach können Sie sich mit [Putty][5] auf die Kommandozeile der virtuellen Maschine verbinden. Port ist `2222`, Benutzername und Passwort sind `vagrant`.
+Danach können Sie sich mit [Putty][5] auf die Kommandozeile der virtuellen Maschine verbinden. Der Host/Severname ist `localhost`, der Port ist `2222`, Benutzername und Passwort sind `vagrant`.
 
 ### Gemeinsamen Ordner einrichten
-Wenn Sie die Scraper-Dateien mit einem Editor auf ihrem PC berabeiten wollen, schalten Sie die Virtuelle Maschine aus und richten Sie einen gemeinsamen Ordner ein. Als Name auf der Maschine verwenden Sie am besten `media/scrapy`. 
+Damit Sie die Scraper-Dateien mit einem Editor auf ihrem PC berabeiten können, schalten Sie die Virtuelle Maschine aus und richten Sie einen gemeinsamen Ordner ein. Klicken Sie in der VirtualBox-Oberfläche auf "Gemeinsame Ordner" und das Hinzufügen-Icon. Wählen Sie einen Ordner aus. Unterhalb des Ordner-Namens sehen Sie den Namen des Ordners in der Virtuellen Maschine. Sie können ihn ändern, z.B. auf `scrapy`. In der folgenden Dokumentation wird der name `scrapy` verwendet. Auf der Virtuellen maschine finden Sie dann denn Ordner unter `/media/sf_scrapy`.
 
 Starten Sie die virtuelle Maschine und kopieren Sie die Scrapy-Dateien auf der Kommandozeile mit folgendem Befehl:
 
-    cp -r /usr/local/vivo2014/* /media/scrapy
-
-Verwenden Sie in den folgenden Schritten den Ordner `/media/scrapy` an Stelle von `/usr/local/vivo2014`.
+    cp -r /usr/local/vivo2014/* /media/sf_scrapy
 
 
 ### Scraper aufrufen
 Wechseln Sie auf der Kommandozeile in den Ordner `/usr/local/vivo2014` mit folgendem Befehl:
 
-    cd /usr/local/vivo2014
+    cd /media/sf_scrapy
 
 Rufen Sie dann die zur Seite passende Spider auf, z.B.
 
@@ -33,7 +31,7 @@ Weitere gültige Spider-Namen sind `hiig_spider` und `gesis_spider`.
 
 Wechseln Sie auf der Kommandozeile in den Ordner `/usr/local/vivo2014` mit folgendem Befehl:
 
-    cd /usr/local/vivo2014
+    cd /media/sf_scrapy
 
 Holen Sie sich die neueste Version vom Server mit
 
