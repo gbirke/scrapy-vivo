@@ -73,8 +73,21 @@ class HiigSpider(Spider):
 
         yield person
 
-    def parse_publications(response):
+    def parse_publications(self,response):
+        
         sel = Selector(response)
         for pub_content in sel.css("#content .publication-APA"):
+            public = Publication()
+            public["source_url"] = response.url
             autoren_und_titel = pub_content.xpath("text()").extract()[0]
+            autoren = split(autoren_und_titel, "(")[0]#zerlegt autoren_und_titel mit der "("(sollen 2 Teile sein)
+            autor = re.split("(.,|&) *",autoren)#in der Schleife muss sein
+            public["author_names"] = author
+            #re.search("([\w]+),",autor[0]).group(1)#Folge von Buchstaben (Ziffern) vor dem Komma
+            #mindestens 1 Mal wiederholt
+            #public["afname"] = re.search(", (\w{1})",autor[0]).group(1)#sucht nach einem Wortzeichen nach ", "
+            public["year"] = re.search("([0-9]{4})\)",split(autoren_und_titel[1], "(").group(1)#sucht nach einer Folge von 4 Ziffern vor dem Klammer
+            source = pub_content.xpath("em/text()").extract()
+            public["source"] = source
             # TODO: Autoren und Titel aufteilen, em parsen (Quelle), Publikationsjahr, etc.
+            yield public
