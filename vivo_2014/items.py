@@ -82,7 +82,7 @@ class Publication(Item):
     volume = Field()
     phrases = Field() # Schlagwoerter
     thesis_type = Field() #fuer die Hochschulschriften
-    series = Field() #Serie
+    source = Field() #Quelle
 
 # Fuer Vortraege s. Know Center
 class Lecture(Item):
