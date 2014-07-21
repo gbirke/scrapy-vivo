@@ -71,8 +71,8 @@ class Publication(Item):
     source_url = Field()
     title = Field()
     publication_date = Field()
-    author_urls = Field() # Liste der Autoren, die auch als Person gespeicjhertt wurden (source_url der Person)
-    author_names = Field() #Autornamen (Array), die einfach nur als Autoren in VIVO gespeicherft werden. Muss evtl noch nachbearbeiztet werden
+    author_urls = Field() # Liste der Autoren, die auch als Person gespeichert wurden (source_url der Person)
+    author_names = Field() #Autornamen (Array), die einfach nur als Autoren in VIVO gespeichert werden. Muss noch nachbearbeitet werden
     year = Field()
     publication_location = Field()
     publisher = Field()
@@ -81,7 +81,7 @@ class Publication(Item):
     volume = Field()
     phrases = Field() # Schlagwoerter
     thesis_type = Field() #fuer die Hochschulschriften
-    source = Field() #Quelle
+    source = Field() #Quelle/URL fuer Index-Informationen
 
 # Fuer Vortraege s. Know Center
 class Lecture(Item):

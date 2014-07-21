@@ -76,7 +76,9 @@ for item in name_der_untermethode():
 ```
 
 ### Items über mehrere Seiten hinweg mit Inhalt füllen
-Um eine neue Seite des Webauftritts zu crawlen, erzeugen Sie ein `Request` Objekt und liefern es mit `yield` zurück. Das `Request` Objekt benötigt eine URL. Da die URL nicht von der `parse` Methode verarbeitet werden soll, müssen Sie außerdem noch den `callback` Parameter verwenden und eine andere Methode zum Verarbeiten der Inhalte angeben. Wenn Sie das aktuell verarbeitete Item in mit weiteren Daten befüllen wollen, müssen Sie außerdem den `meta` Parametere verwenden. Das folgende Beispiel zeigt einen URL-Aufruf mit `callback` und `meta`:
+Es kommt häufiger vor, dass Informationen auf mehreren Seiten verteilt (z.B. bei Personen, bei denen Kontakt-Informationen und Informationen zu Biografie und Publikationen auf verschiedenen Seiten stehen) sind oder Sie für jeden Link auf einer Übersichtsseite eine Detail-Seite aufrufen möchten.
+
+Um eine neue Seite des Webauftritts zu crawlen, erzeugen Sie ein `Request` Objekt und liefern es mit `yield` zurück. Das `Request` Objekt benötigt eine URL. Wenn das Ergebnis des Abrufs nicht von der `parse` Methode verarbeitet werden soll, müssen Sie außerdem den `callback` Parameter verwenden und eine andere Methode zum Verarbeiten der Inhalte angeben. Wenn Sie das aktuell verarbeitete Item in mit weiteren Daten befüllen wollen, müssen Sie außerdem den `meta` Parameter verwenden. Das folgende Beispiel zeigt einen URL-Aufruf mit `callback` und `meta`:
 
 ```python
 yield Request(url, callback=self.parse_person_details, meta={'person':person} )
@@ -110,6 +112,8 @@ def parse_publications(self, response):
         publi["author"] = join(pub_content.xpath("span[2]/text()").extract(), "")
         yield publi
 ```
+
+Sie müssen nicht zwangsläufig ein Item erzeugen, Sie können auch wie im vorigen Abschnitt gezeigt, ein `Request`-Objekt erzeugen und eine weiter führende URL aufrufen.
 
 ## Nachbearbeitung der Items in der Pipeline
 ### Vergeben von IDs
