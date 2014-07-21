@@ -1,12 +1,15 @@
 from string import join, strip
+from hashlib import md5
 from scrapy.spider import Spider
 from scrapy.selector import Selector
 from scrapy.http import Request
 
-from vivo_2014.items import Person, Division, DivisionRole, Organization
+from vivo_2014.items import Person, Division, DivisionRole, Organization, Publication
 
 # We use regular expressions
 import re
+
+
 
 # We use VCard parsing
 import vobject
@@ -128,10 +131,41 @@ class GesisSpider(Spider):
         person["division_role"] = division_role
 
         # TODO Ask students for other fields to parse here
-        # TODO Parse publications
 
         yield person
+        
+        # Parse publication list
+        sel = Selector(response)
+        publications_and_headings = sel.css("#staffPublications").xpath('a[@name]|ul[@class="pubResultList"]')
+        current_publication_type = None
+        source_url_base = response.url.split("#")[0] + "#" # Remove fragment (regardless if it exists) and add fragment separator
+        for item in publications_and_headings:
+            tag_name = join(item.xpath("name()").extract(), "")
+            self.log("[PUB] publication tag %s" % tag_name)
+            if tag_name == "a":
+                current_publication_type = join(item.xpath("h3/text()").extract(), "")
+            elif tag_name == "ul":
+                for pub in item.xpath("li"):
+                    yield self.create_publication(pub, current_publication_type, source_url_base)
 
+    def create_publication(self, publication_item, publication_type, source_url_base):
+        """ Create a publication item from publication_item. 
+            Which type of publication is created, is determined by publication_type
+        """
+        # TODO check publication_type with regex and create different items than just Publication
+        pub = Publication()
+        text = publication_item.xpath("text()").extract()[0]
+        authors_and_year = text.split(":")[0]
+        matched = re.match("([^(]+)\((\d+)", authors_and_year)
+        if matched:
+            author_names = matched.group(1).split(";")
+            pub["author_names"] = [author.strip() for author in author_names] # remove whitespace
+            pub["year"] = matched.group(2)
+
+        # TODO: Fill in title and other information, check for download and DOI link
+
+        pub["source_url"] = source_url_base + md5(text.encode('utf-8')).hexdigest()
+        return pub
 
     def fix_url(self, url):
         """ Make URL absolute """
