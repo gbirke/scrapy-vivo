@@ -145,8 +145,10 @@ class GesisSpider(Spider):
             if tag_name == "a":
                 current_publication_type = join(item.xpath("h3/text()").extract(), "")
             elif tag_name == "ul":
-                for pub in item.xpath("li"):
-                    yield self.create_publication(pub, current_publication_type, source_url_base)
+                for pub_item in item.xpath("li"):
+                     publication = self.create_publication(pub_item, current_publication_type, source_url_base)
+                     # TODO remove person from publication["author_names"] and set publication["author_ids"] instead.
+                     yield Publication
 
     def create_publication(self, publication_item, publication_type, source_url_base):
         """ Create a publication item from publication_item. 
