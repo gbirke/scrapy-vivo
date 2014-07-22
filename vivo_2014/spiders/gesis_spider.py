@@ -148,7 +148,7 @@ class GesisSpider(Spider):
                 for pub_item in item.xpath("li"):
                      publication = self.create_publication(pub_item, current_publication_type, source_url_base)
                      # TODO remove person from publication["author_names"] and set publication["author_ids"] instead.
-                     yield Publication
+                     yield publication
 
     def create_publication(self, publication_item, publication_type, source_url_base):
         """ Create a publication item from publication_item. 
