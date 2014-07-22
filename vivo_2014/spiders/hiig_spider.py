@@ -76,22 +76,12 @@ class HiigSpider(Spider):
     def parse_publications(self,response):
         
         sel = Selector(response)
-        for pub_content in sel.css("#content .publication-APA"):
-            public = Publication()
-            public["source_url"] = response.url
-            pub_content_texte = pub_content.xpath("text()").extract()
-            autoren_und_titel = pub_content_texte[0]
-            autoren = split(autoren_und_titel, "(")[0]#zerlegt autoren_und_titel mit der "("(sollen 2 Teile sein)
-            author = re.split("(\.,|&) *",autoren)#in der Schleife muss sein
-            public["author_names"] = author
-            #re.search("([\w]+),",autor[0]).group(1)#Folge von Buchstaben (Ziffern) vor dem Komma
-            #mindestens 1 Mal wiederholt
-            #public["afname"] = re.search(", (\w{1})",autor[0]).group(1)#sucht nach einem Wortzeichen nach ", "
-            jahreszahl_und_titel = split(autoren_und_titel, "(")[1]
-            year_match = re.search("([0-9]{4})\)", jahreszahl_und_titel)
-            if year_match:
-                public["year"] = year_match.group(1)#sucht nach einer Folge von 4 Ziffern vor dem Klammer
-            source = pub_content.xpath("em/text()").extract()
-            public["source"] = source
-            # TODO: Titel aufteilen, em parsen (Quelle), Publikationsjahr, etc.
-            yield public
+        for pub_link in sel.css("#content .publication-APA a"):
+            url = pub_link.xpath("@href").extract()[0]
+            yield Request(url, callback=self.parse_publication_detail)
+
+    def parse_publication_detail(self,response):
+        sel = Selector(response)
+        infotable = sel.xpath("div[@id='content']/div/table")
+        author = join(infotable.xpath("tr[1]/td[2]/text()").extract(), "")
+        

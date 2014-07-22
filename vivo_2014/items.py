@@ -75,6 +75,7 @@ class Publication(Item):
     author_names = Field() #Autornamen (Array), die einfach nur als Autoren in VIVO gespeichert werden. Muss noch nachbearbeitet werden
     year = Field()
     publication_location = Field() # In welchem Land/Stadt wurde die Veroeffentlichung publiziert
+    published_in = Field() # Name des Journals / Events / etc.
     publisher = Field()
     organ = Field() # herausgebende Koerperschaft
     vispagename = Field()
@@ -82,7 +83,8 @@ class Publication(Item):
     doi = Field() # Digital Object Identifier
     phrases = Field() # Schlagwoerter
     thesis_type = Field() #fuer die Hochschulschriften
-    source = Field() #Quelle/URL fuer Index-Informationen
+    publication_type = Field() # Publikationstyp (z.B. )
+    
 
 # Fuer Vortraege s. Know Center
 class Lecture(Item):
