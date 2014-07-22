@@ -71,6 +71,7 @@ class Publication(Item):
     source_url = Field()
     title = Field()
     publication_date = Field() # komplettes Erscheinungsdatum, wenn vorhanden
+    year = Field()# Erscheinungsjahr
     author_urls = Field() # Liste der Autoren, die auch als Person gespeichert wurden (source_url der Person)
     author_names = Field() #Autornamen (Array), die einfach nur als Autoren in VIVO gespeichert werden. Muss noch nachbearbeitet werden
     publication_location = Field() # In welchem Land/Stadt wurde die Veroeffentlichung publiziert
