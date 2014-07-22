@@ -74,11 +74,12 @@ class Publication(Item):
     author_urls = Field() # Liste der Autoren, die auch als Person gespeichert wurden (source_url der Person)
     author_names = Field() #Autornamen (Array), die einfach nur als Autoren in VIVO gespeichert werden. Muss noch nachbearbeitet werden
     year = Field()
-    publication_location = Field()
+    publication_location = Field() # In welchem Land/Stadt wurde die Veroeffentlichung publiziert
     publisher = Field()
     organ = Field() # herausgebende Koerperschaft
     vispagename = Field()
     volume = Field()
+    doi = Field() # DOI 
     phrases = Field() # Schlagwoerter
     thesis_type = Field() #fuer die Hochschulschriften
     source = Field() #Quelle/URL fuer Index-Informationen

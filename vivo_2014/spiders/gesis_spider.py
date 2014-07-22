@@ -164,9 +164,20 @@ class GesisSpider(Spider):
             pub["author_names"] = [author.strip() for author in author_names] # remove whitespace
             pub["year"] = matched.group(2)
 
-        # TODO: Fill in title and other information, check for download and DOI link
+        # TODO: Fill in title and other information
 
-        pub["source_url"] = source_url_base + md5(text.encode('utf-8')).hexdigest()
+        # Extract DOI and download link (which will be used as source url)
+        doi_proxy_url = "http://dx.doi.org/"
+        for link in publication_item.xpath("a"):
+            url = join(link.xpath("@href").extract(), "")
+            if re.match(doi_proxy_url, url):
+                pub["doi"] = url.replace(doi_proxy_url, "")
+            elif re.search("Download", join(link.xpath("text()").extract(), "")):
+                pub["source_url"] = url
+
+        # If there is no download link, create a unique ID from the text
+        if "source_url" not in pub:
+            pub["source_url"] = source_url_base + md5(text.encode('utf-8')).hexdigest()
         return pub
 
     def fix_url(self, url):
