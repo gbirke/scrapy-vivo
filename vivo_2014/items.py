@@ -79,7 +79,7 @@ class Publication(Item):
     organ = Field() # herausgebende Koerperschaft
     vispagename = Field()
     volume = Field()
-    doi = Field() # DOI 
+    doi = Field() # Digital Object Identifier
     phrases = Field() # Schlagwoerter
     thesis_type = Field() #fuer die Hochschulschriften
     source = Field() #Quelle/URL fuer Index-Informationen
