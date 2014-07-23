@@ -27,10 +27,7 @@ class Person(Item):
     
     # TODO: CV, Description, other fields? Ask students
 
-    # TODO "field" for given name and surname, derived from name. 
-    #    If it contains "von/van", use that as separator, otherwise 
-    #    use leftmost word as surname and the rest as given name
-    #    See also "Falsehoods programmers believe about names"
+    # TODO Use Name class with the right splitters in each person crawler and update the RDF export accordingly
     pass
 
 # Used for divisions of an organization, eg. at http://www.zbw.eu/de/forschung/
