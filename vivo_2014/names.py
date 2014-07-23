@@ -47,7 +47,11 @@ class NameCollection:
         self.splitter = splitter
 
     def get_names(self, names_string, separator=","):
-        return [self.splitter.get_name(name) for name in re.split(separator, names_string)]
+        name_list = []
+        for name in re.split(separator, names_string):
+            if name:
+                name_list.append(self.splitter.get_name(name))
+        return name_list
 
     def get_names_list(self, names_string, separator=","):
         return [name.to_list() for name in self.get_names(names_string, separator)]

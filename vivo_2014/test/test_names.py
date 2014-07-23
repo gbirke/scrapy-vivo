@@ -25,7 +25,15 @@ class NameTest(unittest.TestCase):
         splitter = LastnameFirstnameSplitter(",\s*")
         collection = NameCollection(splitter)
         result = collection.get_names_list("Snow, John; Tarly, Samwell", ";\s*")
-        self.assertEquals(result, expected)        
+        self.assertEquals(result, expected)
+
+
+    def test_name_collection_with_separator_duplication(self):
+        expected = [["John", "Snow"], ["Samwell", "Tarly"]]
+        splitter = LastnameFirstnameSplitter(",\s*")
+        collection = NameCollection(splitter)
+        result = collection.get_names_list("Snow, John;; Tarly, Samwell", ";\s*")
+        self.assertEquals(result, expected)
 
 if __name__ == "__main__": 
     unittest.main()
