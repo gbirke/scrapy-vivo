@@ -10,6 +10,16 @@ class Name:
         self.firstname = firstname
         self.lastname = lastname
 
+    def __eq__(self, other):
+        """ Check if two name instances have the same data. If yes, they are considered equal"""
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def to_list(self):
         return [self.firstname, self.lastname]
 
