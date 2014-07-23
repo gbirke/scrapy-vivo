@@ -4,6 +4,7 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 
 from vivo_2014.items import Person, Organization, Publication, Lecture, Event
+from vivo_2014.names import *
 
 import re
 
@@ -13,8 +14,7 @@ class HiigSpider(Spider):
     start_urls = [
         #"http://www.hiig.de/institute/organisation/",
         #"http://www.hiig.de/personen/",
-        #"http://www.hiig.de/ausgewahlte-publikationen/" #  sollten wir nicht lieber das Link nehmen: 
-        http://www.hiig.de/publikationen-des-hiig/  
+        "http://www.hiig.de/publikationen-des-hiig/",
     ]
 
     def parse(self, response):
@@ -79,21 +79,24 @@ class HiigSpider(Spider):
         sel = Selector(response)
         for pub_link in sel.css("#content .publication-APA a"):
             url = pub_link.xpath("@href").extract()[0]
-            yield Request(url, callback=self.parse_publication_detail)
+            publi = Publication()
+            publi["source_url"] = url
+            yield Request(url, callback=self.parse_publication_detail, meta={"publi": publi})
 
     def parse_publication_detail(self,response):
-        publi = Publications()
-        #publi = response.meta['publi']
+        publi = response.meta['publi']
         sel = Selector(response)
-        infotable = sel.xpath("div[@id='content']/div/table")
-        authors = join(infotable.xpath("tr[1]/td[2]/text()").extract(), "")
-        publi["author_names"] = authors
-        year = join(infotable.xpath("tr[3]/td[2]/text()").extract(), "")
+        infotable = sel.css("#content").xpath("div/table")
+        authors = join(infotable.xpath("tr[1]/td[2]/span/text()").extract(), "")
+        name_collector = NameCollection(LastnameFirstnameSplitter(",\s*"))
+        publi["author_names"] = name_collector.get_names_list(authors, "\.,|&")
+        year = join(infotable.xpath("tr[3]/td[2]/span/text()").extract(), "").strip()
         publi["year"] = year
-        pubtype = join(infotable.xpath("tr[4]/td[2]/text()").extract(), "")
+        pubtype = join(infotable.xpath("tr[4]/td[2]/span/text()").extract(), "").strip()
         publi["publication_type"] = pubtype
         
         #source_details = join(infotable.xpath("tr[2]/td[2]/text()").extract(), "")
         #source_title = source_details
         #published_in = 
+        yield publi
         
