@@ -35,8 +35,11 @@ class NameTest(unittest.TestCase):
         expected = [["John", "Snow"], ["Samwell", "Tarly"]]
         splitter = LastnameFirstnameSplitter(",")
         collection = NameCollection(splitter)
-        result = collection.get_names_list("Snow, John;; Tarly, Samwell", ";\s*")
+        result = collection.get_names_list("Snow, John;; Tarly, Samwell", ";")
         self.assertEquals(result, expected)
+        result = collection.get_names_list("Snow, John; ; Tarly, Samwell", ";")
+        self.assertEquals(result, expected)
+
 
 if __name__ == "__main__": 
     unittest.main()

@@ -58,6 +58,7 @@ class NameCollection:
     def get_names(self, names_string, separator=","):
         name_list = []
         for name in re.split(separator, names_string):
+            name = name.strip()
             if name:
                 name_list.append(self.splitter.get_name(name))
         return name_list
