@@ -5,6 +5,7 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 
 from vivo_2014.items import Person, Division, DivisionRole, Organization, Publication
+from vivo_2014.names import NameCollection, LastnameFirstnameSplitter
 
 # We use regular expressions
 import re
@@ -141,7 +142,6 @@ class GesisSpider(Spider):
         source_url_base = response.url.split("#")[0] + "#" # Remove fragment (regardless if it exists) and add fragment separator
         for item in publications_and_headings:
             tag_name = join(item.xpath("name()").extract(), "")
-            self.log("[PUB] publication tag %s" % tag_name)
             if tag_name == "a":
                 current_publication_type = join(item.xpath("h3/text()").extract(), "")
             elif tag_name == "ul":
@@ -160,8 +160,8 @@ class GesisSpider(Spider):
         authors_and_year = text.split(":")[0]
         matched = re.match("([^(]+)\((\d+)", authors_and_year)
         if matched:
-            author_names = matched.group(1).split(";")
-            pub["author_names"] = [author.strip() for author in author_names] # remove whitespace
+            name_collection = NameCollection(LastnameFirstnameSplitter(","))
+            pub["author_names"] = name_collection.get_names_list(matched.group(1), ";")
             pub["year"] = matched.group(2)
 
         # TODO: Fill in title and other information
