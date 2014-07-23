@@ -13,6 +13,10 @@ class Name:
     def to_list(self):
         return [self.firstname, self.lastname]
 
+    @classmethod
+    def from_list(cls, name_list):
+        return cls(name_list[0], name_list[1])
+
 # Split names based on separator. 
 # It's very naive at the moment and does not account for prefixes like "von", "de", etc.
 class AbstractSeparatorNameSplitter:
@@ -29,16 +33,21 @@ class AbstractSeparatorNameSplitter:
     def get_name_list(self, name):
         return self.get_name(name).to_list()
 
+    def strip_whitespace_from_name_parts(self, name_parts):
+        return [p.strip() for p in name_parts]
+
 
 class FirstnameLastnameSplitter(AbstractSeparatorNameSplitter):
     def get_name(self, name):
-        first, last = self.split(name)
-        return Name(first, last)
+        name_parts = self.split(name)
+        return Name.from_list(self.strip_whitespace_from_name_parts(name_parts))
 
 class LastnameFirstnameSplitter(AbstractSeparatorNameSplitter):
     def get_name(self, name):
-        last, first = self.split(name)
-        return Name(first, last)
+        name_parts = self.split(name)
+        name_parts.reverse()
+        return Name.from_list(self.strip_whitespace_from_name_parts(name_parts))
+        
 
 
 class NameCollection:
