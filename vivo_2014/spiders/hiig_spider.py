@@ -13,7 +13,8 @@ class HiigSpider(Spider):
     start_urls = [
         #"http://www.hiig.de/institute/organisation/",
         #"http://www.hiig.de/personen/",
-        "http://www.hiig.de/ausgewahlte-publikationen/"
+        #"http://www.hiig.de/ausgewahlte-publikationen/" #  sollten wir nicht lieber das Link nehmen: 
+        http://www.hiig.de/publikationen-des-hiig/  
     ]
 
     def parse(self, response):
@@ -81,7 +82,18 @@ class HiigSpider(Spider):
             yield Request(url, callback=self.parse_publication_detail)
 
     def parse_publication_detail(self,response):
+        publi = Publications()
+        #publi = response.meta['publi']
         sel = Selector(response)
         infotable = sel.xpath("div[@id='content']/div/table")
-        author = join(infotable.xpath("tr[1]/td[2]/text()").extract(), "")
+        authors = join(infotable.xpath("tr[1]/td[2]/text()").extract(), "")
+        publi["author_names"] = authors
+        year = join(infotable.xpath("tr[3]/td[2]/text()").extract(), "")
+        publi["year"] = year
+        pubtype = join(infotable.xpath("tr[4]/td[2]/text()").extract(), "")
+        publi["publication_type"] = pubtype
+        
+        #source_details = join(infotable.xpath("tr[2]/td[2]/text()").extract(), "")
+        #source_title = source_details
+        #published_in = 
         
