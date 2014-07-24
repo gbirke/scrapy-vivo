@@ -107,9 +107,10 @@ class HiigSpider(Spider):
                 source_autoren = titel_und_quelle.split("In")[1]# ob wir das brauchen
                 public["published_in"] = pub_content.xpath("em/text()").extract()
                 pages_and_publisher = pub_content_texte[1]
-                pages = re.search("pp.([0-9]+)\-([0-9]+)", pages_and_publisher)
-                public["startpage"] = pages.group(1)
-                public["endpage"] = pages.group(2)
+                pages_match = re.search("pp.([0-9]+)\-([0-9]+)", pages_and_publisher)
+                if pages_match:
+                    public["startpage"] = pages.group(1)
+                    public["endpage"] = pages.group(2)
             else re.search("Sonstige Publikationen", pubtype):
                 title = split(autoren_und_titel, "\d).")[1]
                 public["title"] = title
