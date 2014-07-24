@@ -87,6 +87,12 @@ class HiigSpider(Spider):
             title = split(autoren_und_titel, ").")[1]
             public["title"] = title
             yield public
+        ########### title for books
+        for pub_content in sel.css("#content .publication-APA"):# TODO bezeichnen, dass es nur fuer books gilt
+            public = Publication()
+            pub_book_title = pub_content.xpath("em/text()").extract()
+            public["title"] = pub_book_title
+            yield public
 ####################################
         for pub_link in sel.css("#content .publication-APA a"):
             url = pub_link.xpath("@href").extract()[0]
