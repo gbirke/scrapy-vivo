@@ -9,7 +9,7 @@ Installieren Sie die VirtualBox-Datei `SCRAPY.OVA` in VirtualBox über das Menü
 Danach können Sie sich mit [Putty][5] auf die Kommandozeile der virtuellen Maschine verbinden. Der Host/Severname ist `localhost`, der Port ist `2222`, Benutzername und Passwort sind `vagrant`.
 
 ### Gemeinsamen Ordner einrichten
-Damit Sie die Scraper-Dateien mit einem Editor auf ihrem PC berabeiten können, schalten Sie die Virtuelle Maschine aus und richten Sie einen gemeinsamen Ordner ein. Klicken Sie in der VirtualBox-Oberfläche auf "Gemeinsame Ordner" und das Hinzufügen-Icon. Wählen Sie einen Ordner aus. Unterhalb des Ordner-Namens sehen Sie den Namen des Ordners in der Virtuellen Maschine. Sie können ihn ändern, z.B. auf `scrapy`. In der folgenden Dokumentation wird der name `scrapy` verwendet. Auf der Virtuellen maschine finden Sie dann denn Ordner unter `/media/sf_scrapy`.
+Damit Sie die Scraper-Dateien mit einem Editor auf ihrem PC berabeiten können, schalten Sie die Virtuelle Maschine aus und richten Sie einen gemeinsamen Ordner ein. Klicken Sie in der VirtualBox-Oberfläche auf "Gemeinsame Ordner" und das Hinzufügen-Icon. Wählen Sie einen Ordner aus. Unterhalb des Ordner-Namens sehen Sie den Namen des Ordners in der Virtuellen Maschine. Sie können ihn ändern, z.B. auf `scrapy`. "..." anhacken In der folgenden Dokumentation wird der name `scrapy` verwendet. Auf der Virtuellen maschine finden Sie dann denn Ordner unter `/media/sf_scrapy`.
 
 Starten Sie die virtuelle Maschine und kopieren Sie die Scrapy-Dateien auf der Kommandozeile mit folgendem Befehl:
 
