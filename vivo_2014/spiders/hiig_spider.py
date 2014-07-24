@@ -87,6 +87,10 @@ class HiigSpider(Spider):
             autoren = autoren_und_titel.split("(")[0]
             name_collector = NameCollection(LastnameFirstnameSplitter(","))
             public["author_names"] = name_collector.get_names_list(autoren, "\.,|&")
+            jahreszahl_und_titel = autoren_und_titel.split("(")[1]
+            year_match = re.search("([0-9]{4})\)", jahreszahl_und_titel)
+            if year_match:
+                public["year"] = year_match.group(1)
             if re.search("Wissenschaftliche Artikel", pubtype):
                 title = split(autoren_und_titel, ").")[1]
                 public["title"] = title
@@ -97,6 +101,22 @@ class HiigSpider(Spider):
                 pub_book_title = pub_content.xpath("em/text()").extract()
                 public["title"] = pub_book_title                
                 public["publication_type"] = "Book"
+            elif re.search("Buchbeitr.+ge", pubtype):
+                titel_und_quelle = split(autoren_und_titel, ").")[1]
+                public["title"] = titel_und_quelle.split("In")[0]
+                source_autoren = titel_und_quelle.split("In")[1]# ob wir das brauchen
+                public["published_in"] = pub_content.xpath("em/text()").extract()
+                pages_and_publisher = pub_content_texte[1]
+                pages = re.search("pp.([0-9]+)\-([0-9]+)", pages_and_publisher)
+                public["startpage"] = pages.group(1)
+                public["endpage"] = pages.group(2)
+            else re.search("Sonstige Publikationen", pubtype):
+                title = split(autoren_und_titel, "\d).")[1]
+                public["title"] = title
+                pub_content_source = pub_content.xpath("em/text()").extract()
+                public["published_in"] = pub_content_source
+             
+                
 
             url = pub_content.xpath("a/@href").extract()[0]
             public["source_url"] = url
@@ -106,6 +126,7 @@ class HiigSpider(Spider):
     def parse_publication_detail(self,response):
         publi = response.meta['publi']
         sel = Selector(response)
+        
         infotable = sel.css("#content").xpath("div/table")
         authors = join(infotable.xpath("tr[1]/td[2]/span/text()").extract(), "")
         name_collector = NameCollection(LastnameFirstnameSplitter(",\s*"))
