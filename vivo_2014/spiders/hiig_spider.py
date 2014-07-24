@@ -136,9 +136,7 @@ class HiigSpider(Spider):
         publi["year"] = year
         pubtype = join(infotable.xpath("tr[4]/td[2]/span/text()").extract(), "").strip()
         publi["publication_type"] = pubtype
-        
-        #source_details = join(infotable.xpath("tr[2]/td[2]/text()").extract(), "")
-        #source_title = source_details
-        #published_in = 
+        if re.search("Buchbeitr.+ge", pubtype):
+            publi["published_in"] = join(infotable.xpath("tr[2]/td[2]/span/em/text()").extract(), "")
         yield publi
         
