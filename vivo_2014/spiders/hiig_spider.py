@@ -77,6 +77,17 @@ class HiigSpider(Spider):
     def parse_publications(self,response):
         
         sel = Selector(response)
+        #######################fuer Wiss. Artikel?? gehen mehrere for-Schleifen in einem def?
+        for pub_content in sel.css("#content .publication-APA"):
+            public = Publication()
+            pub_content_source = pub_content.xpath("em/text()").extract()
+            public["published_in"] = pub_content_source
+            pub_content_texte = pub_content.xpath("text()").extract()
+            autoren_und_titel = pub_content_texte[0]
+            title = split(autoren_und_titel, ").")[1]
+            public["title"] = title
+            yield public
+####################################
         for pub_link in sel.css("#content .publication-APA a"):
             url = pub_link.xpath("@href").extract()[0]
             publi = Publication()
