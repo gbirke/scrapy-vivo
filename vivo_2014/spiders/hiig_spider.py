@@ -79,26 +79,29 @@ class HiigSpider(Spider):
         sel = Selector(response)
         #######################fuer Wiss. Artikel?? gehen mehrere for-Schleifen in einem def?
         for pub_content in sel.css("#content .publication-APA"):
+            pubtype = join(pub_content.xpath("preceding::h3[1]/text()").extract(), "")
             public = Publication()
-            pub_content_source = pub_content.xpath("em/text()").extract()
-            public["published_in"] = pub_content_source
+            
             pub_content_texte = pub_content.xpath("text()").extract()
             autoren_und_titel = pub_content_texte[0]
-            title = split(autoren_und_titel, ").")[1]
-            public["title"] = title
-            yield public
-        ########### title for books
-        for pub_content in sel.css("#content .publication-APA"):# TODO bezeichnen, dass es nur fuer books gilt
-            public = Publication()
-            pub_book_title = pub_content.xpath("em/text()").extract()
-            public["title"] = pub_book_title
-            yield public
-####################################
-        for pub_link in sel.css("#content .publication-APA a"):
-            url = pub_link.xpath("@href").extract()[0]
-            publi = Publication()
-            publi["source_url"] = url
-            yield Request(url, callback=self.parse_publication_detail, meta={"publi": publi})
+            autoren = autoren_und_titel.split("(")[0]
+            name_collector = NameCollection(LastnameFirstnameSplitter(","))
+            public["author_names"] = name_collector.get_names_list(autoren, "\.,|&")
+            if re.search("Wissenschaftliche Artikel", pubtype):
+                title = split(autoren_und_titel, ").")[1]
+                public["title"] = title
+                pub_content_source = pub_content.xpath("em/text()").extract()
+                public["published_in"] = pub_content_source
+                public["publication_type"] = "Academic Article"
+            elif re.search("B.+cher", pubtype):
+                pub_book_title = pub_content.xpath("em/text()").extract()
+                public["title"] = pub_book_title                
+                public["publication_type"] = "Book"
+
+            url = pub_content.xpath("a/@href").extract()[0]
+            public["source_url"] = url
+            
+            yield Request(url, callback=self.parse_publication_detail, meta={"publi": public})
 
     def parse_publication_detail(self,response):
         publi = response.meta['publi']
