@@ -75,9 +75,7 @@ class HiigSpider(Spider):
         yield person
 
     def parse_publications(self,response):
-        
         sel = Selector(response)
-        #######################fuer Wiss. Artikel?? gehen mehrere for-Schleifen in einem def?
         for pub_content in sel.css("#content .publication-APA"):
             pubtype = join(pub_content.xpath("preceding::h3[1]/text()").extract(), "")
             public = Publication()
@@ -130,13 +128,18 @@ class HiigSpider(Spider):
         
         infotable = sel.css("#content").xpath("div/table")
         authors = join(infotable.xpath("tr[1]/td[2]/span/text()").extract(), "")
-        name_collector = NameCollection(LastnameFirstnameSplitter(",\s*"))
+        name_collector = NameCollection(LastnameFirstnameSplitter(",\s*")) # wie weiß name_collector, für welche Spalte er das macht?
         publi["author_names"] = name_collector.get_names_list(authors, "\.,|&")
         year = join(infotable.xpath("tr[3]/td[2]/span/text()").extract(), "").strip()
         publi["year"] = year
         pubtype = join(infotable.xpath("tr[4]/td[2]/span/text()").extract(), "").strip()
         publi["publication_type"] = pubtype
         if re.search("Buchbeitr.+ge", pubtype):
-            publi["published_in"] = join(infotable.xpath("tr[2]/td[2]/span/em/text()").extract(), "")
+            source = infotable.xpath("tr[2]/td[2]/span/text()").extract()
+            pages_and_puplisher = source[1]
+            publi["publisher"] = split(pages_and_publisher, ":")[1]
+            # publi["publisher"] = split(source[1], ":")[1]
+            publi["published_in"] = infotable.xpath("tr[2]/td[2]/span/em/text()").extract()
+            
         yield publi
         
