@@ -109,12 +109,13 @@ class HiigSpider(Spider):
                 if pages_match:
                     public["startpage"] = pages.group(1)
                     public["endpage"] = pages.group(2)
-            else re.search("Sonstige Publikationen", pubtype):
-                title = split(autoren_und_titel, "\d).")[1]
+            elif re.search("Sonstige Publikationen", pubtype):
+                title = split(autoren_und_titel, "\d).")[1] # Hier gibt es einen Fehler, willst du das 1. oder 2. element? Das 1. hat Index 0
                 public["title"] = title
                 pub_content_source = pub_content.xpath("em/text()").extract()
                 public["published_in"] = pub_content_source
-             
+            else:
+                self.log("UNKNOWN PUBLICATION TYPE!")
                 
 
             url = pub_content.xpath("a/@href").extract()[0]
@@ -128,7 +129,7 @@ class HiigSpider(Spider):
         
         infotable = sel.css("#content").xpath("div/table")
         authors = join(infotable.xpath("tr[1]/td[2]/span/text()").extract(), "")
-        name_collector = NameCollection(LastnameFirstnameSplitter(",\s*")) # wie weiß name_collector, für welche Spalte er das macht?
+        name_collector = NameCollection(LastnameFirstnameSplitter(",\s*")) # wie weiss name_collector, fuer welche Spalte er das macht?
         publi["author_names"] = name_collector.get_names_list(authors, "\.,|&")
         year = join(infotable.xpath("tr[3]/td[2]/span/text()").extract(), "").strip()
         publi["year"] = year
