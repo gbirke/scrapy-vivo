@@ -4,9 +4,9 @@ Dieses Projekt durchsucht Webseiten des Science 2.0 Forschungsverbundes nach Dat
 
 ## Verwendung
 ### Installation
-Installieren Sie die VirtualBox-Datei `SCRAPY.OVA` in VirtualBox über das Menü "Datei -> Appliance importieren ...". Starten Sie die virtuelle Maschine.
+Installieren Sie die VirtualBox-Datei `SCRAPY.OVA` in VirtualBox über das Menü "Datei -> Appliance importieren ...". Starten Sie die virtuelle Maschine. Die ersten Meldungen über Maus und Tastatur ignorieren. Benutzername und Passwort: `vagrant`. Während der Eingabe vom Passwort bleibt der Cursor auf einer Stelle.
 
-Danach können Sie sich mit [Putty][5] auf die Kommandozeile der virtuellen Maschine verbinden. Der Host/Severname ist `localhost`, der Port ist `2222`, Benutzername und Passwort sind `vagrant`.
+Danach können Sie sich mit [Putty][5] auf die Kommandozeile der virtuellen Maschine verbinden. Der Host/Severname ist `localhost`, der Port ist `2222`, Benutzername und Passwort sind `vagrant`. Das Einfügen von kopierten Befehlen in die Kommandozeile passiert durch Rechtsklick. Strg+V funktioniert nicht. 
 
 ### Gemeinsamen Ordner einrichten
 Damit Sie die Scraper-Dateien mit einem Editor auf ihrem PC berabeiten können, schalten Sie die Virtuelle Maschine aus und richten Sie einen gemeinsamen Ordner ein. Klicken Sie in der VirtualBox-Oberfläche auf "Gemeinsame Ordner" und das Hinzufügen-Icon. Wählen Sie einen Ordner aus. Unterhalb des Ordner-Namens sehen Sie den Namen des Ordners in der Virtuellen Maschine. Sie können ihn ändern, z.B. auf `scrapy`. "..." anhacken In der folgenden Dokumentation wird der name `scrapy` verwendet. Auf der Virtuellen maschine finden Sie dann denn Ordner unter `/media/sf_scrapy`.
@@ -25,7 +25,7 @@ Rufen Sie dann die zur Seite passende Spider auf, z.B.
 
     scrapy crawl zbw_spider
 
-Weitere gültige Spider-Namen sind `hiig_spider` und `gesis_spider`.
+, bekommen Sie dann die Ergebnisse der Crawling. Weitere gültige Spider-Namen sind `hiig_spider` und `gesis_spider`.
 
 ### Speichern der Änderungen mit git
 
@@ -50,14 +50,25 @@ Um die Änderungen auf den Server zu überspielen, geben Sie folgenden Befehl ei
 ## Konzepte
 Um die Daten einer Webseite zu speichern, benötigt Scrapy zunächst eine Datenstruktur, in der die Daten gespeichert werden sollen. Diese Datenstruktur heißt **Item**. Die verschiedenen Typen von Items sind in der Datei `items.py` gespeichert.
 
-Um die Webseite nach Daten zu durchsuchen, benutzt Scrapy eine sogenannte **Spider**. Eine Spider bekommt eine Liste von URLs als Start-Daten, lädt die Inhalte der HTML-Seiten herunter,  verarbeitet sie und erzeugt dabei entweder eine weitere URL, die abgearbeitet werden muss oder ein Item, das gespeichert werden soll. Zum Verarbeiten von HTML-Daten benutzt Scrapy **Selektoren**, mit denen mit Hilfe von [XPATH][3]-Ausdrücken oder [CSS-Selektoren][4] in der Struktur des HTML-Dokuments navigiert und spezifische Inhalte abgerufen werden können.  
+Um die Webseite nach Daten zu durchsuchen, benutzt Scrapy eine sogenannte **Spider**. Eine Spider bekommt eine Liste von URLs als Start-Daten, lädt die Inhalte der HTML-Seiten herunter,  verarbeitet sie und erzeugt dabei entweder eine weitere URL, die abgearbeitet werden muss oder ein Item, das gespeichert werden soll. Zum Verarbeiten von HTML-Daten benutzt Scrapy **Selektoren**, mit denen mit Hilfe von [XPATH][3]-Ausdrücken oder [CSS-Selektoren][4] in der Struktur des HTML-Dokuments navigiert und spezifische Inhalte abgerufen werden können. Wenn es mehrere gleichnamige Elemente im Quellcode gibt, wäre sinnvoll lieber XPATH zu benutzen 
 Die Spider-Programme sind im Ordner `spiders` gespeichert. Jede Webseite braucht aufgrund ihrer individuellen HTML-Struktur eine eigene Spider.
 
 Die Items werden nach dem Erzeugen durch die Spider nicht sofort gespeichert, sondern durchlaufen erst noch die **Pipeline**. Dort können sie nachbearbeitet werden. Im konkreten Fall nutzt das Projekt die Pipeline, um eindeutige IDs zu vergeben und die Items ins RDF-Format zu konvertieren.
 
 ## Aufbau einer Spider
-Eine Spider beginnt immer mit der Deklaration des Namens, der erlaubten Domains (URLs außerhalb der erlaubten Domains werden nicht abgerufen) und der Start-URLs. Außerdem muss sie immer die Methode `parse` enthalten. In unserem Projekt verzweigt sich `parse` in Methoden zum Verarbeiten der Informationen über die Haupt-Organisation und zum Verarbeiten der Abteilungen der Organisation. 
-
+Eine Spider beginnt immer mit der Deklaration des Namens, der erlaubten Domains (URLs außerhalb der erlaubten Domains werden nicht abgerufen) und der Start-URLs. 
+```
+class HiigSpider(Spider):
+    name = "hiig_spider"
+    allowed_domains = ["www.hiig.de"]
+    start_urls = [
+        "http://www.hiig.de/institute/organisation/",
+        "http://www.hiig.de/personen/",
+        "http://www.hiig.de/publikationen-des-hiig/",
+    ]
+```
+Außerdem muss sie immer die Methode `parse` enthalten. In unserem Projekt verzweigt sich `parse` in Methoden zum Verarbeiten der Informationen über die Haupt-Organisation und zum Verarbeiten der Abteilungen der Organisation. 
+Um während der Bearbeitung die Ergebnisse nur eines Teils der Webseite zu bekommen, könnte man die übrigen URLs auskommentieren.
 ### Daten extrahieren
 Egal ob ein XPATH oder ein CSS-Selektor verwendet wird, am Ende des Ausdrucks muss, wenn Daten erzeugt werden sollen, die Methode `extract()` stehen. Die Methode liefert stets ein Array zurück, auch wenn der Selektor-Ausdruck nur genau einen Inhalt extrahiert. Um das Array in eine Zeichenkette umzuwandeln, verwenden Sie die Funktion `join`. Ein typischer Ausdruck zum Extrahieren einer Zeichenkette sieht wie folgt aus:
 
