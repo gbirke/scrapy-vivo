@@ -96,7 +96,7 @@ class HiigSpider(Spider):
                 public["published_in"] = pub_content_source
                 public["publication_type"] = "Academic Article"
             elif re.search("B.+cher", pubtype):
-                pub_book_title = pub_content.xpath("em/text()").extract()
+                pub_book_title = join(pub_content.xpath("em/text()").extract(), "")
                 public["title"] = pub_book_title                
                 public["publication_type"] = "Book"
             elif re.search("Buchbeitr.+ge", pubtype):
