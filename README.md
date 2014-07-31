@@ -27,6 +27,12 @@ Rufen Sie dann die zur Seite passende Spider auf, z.B.
 
 , bekommen Sie dann die Ergebnisse der Crawling. Weitere gültige Spider-Namen sind `hiig_spider` und `gesis_spider`.
 
+Wenn Sie die JSON-Ergebnisse in einer Datei speichern möchten, müssen Sie den Aufruf wie folgt machen (das Beispiel erzeugt die Datei zbw_items.json):
+
+    scrapy crawl -o zbw_items.json zbw_spider
+
+Die Datei ist *kein* gültiges JSON, weil jedes Item in einer Zeile steht. Um sie umzuwandeln, müssen Sie am Anfang und ende der Datei eine eckige klammer einfügen und am Anfang jeder Zeile außer der ersten ein Komma. Dann steht in der Datei ein gültiges JSON-Array. Mit einem TextEditor, der reguläre Ausdrücke suchen kann, geht diese Umwandlung sehr schnell, indem Sie den Ausdruck `^` durch `,` ersetzen.
+
 ### Speichern der Änderungen mit git
 
 Wechseln Sie auf der Kommandozeile in den Ordner `/media/sf_scrapy` mit folgendem Befehl:
@@ -57,7 +63,8 @@ Die Items werden nach dem Erzeugen durch die Spider nicht sofort gespeichert, so
 
 ## Aufbau einer Spider
 Eine Spider beginnt immer mit der Deklaration des Namens, der erlaubten Domains (URLs außerhalb der erlaubten Domains werden nicht abgerufen) und der Start-URLs. 
-```
+
+```python
 class HiigSpider(Spider):
     name = "hiig_spider"
     allowed_domains = ["www.hiig.de"]
@@ -69,14 +76,34 @@ class HiigSpider(Spider):
 ```
 Außerdem muss sie immer die Methode `parse` enthalten. In unserem Projekt verzweigt sich `parse` in Methoden zum Verarbeiten der Informationen über die Haupt-Organisation und zum Verarbeiten der Abteilungen der Organisation. 
 Um während der Bearbeitung die Ergebnisse nur eines Teils der Webseite zu bekommen, könnte man die übrigen URLs auskommentieren.
+
+### Parse-Methoden
+Die `parse`-Methode und alle folgenden Methoden, die Daten von der Webseite verarbeiten, haben den `response`-Parameter. In dieser Variablen stehen die URL der aktuell verarbeiteten Seite, das HTML der Seite und Meta-Informationen über den Seitenabruf (wird später im Abschnitt "(Items über mehrere Seiten hinweg mit Inhalt füllen)[#mehrere_seiten]" besprochen).
+Das folgende Beispiel zeigt, wie `response` verwendet wird, um
+
+- Einen Selektor zu initialisieren
+- Die akutelle URl der Seite auszulesen
+
+```python
+def parse_person(self, response):
+    sel = Selector(response)
+    url = response.url
+```
+
 ### Daten extrahieren
 Egal ob ein XPATH oder ein CSS-Selektor verwendet wird, am Ende des Ausdrucks muss, wenn Daten erzeugt werden sollen, die Methode `extract()` stehen. Die Methode liefert stets ein Array zurück, auch wenn der Selektor-Ausdruck nur genau einen Inhalt extrahiert. Um das Array in eine Zeichenkette umzuwandeln, verwenden Sie die Funktion `join`. Ein typischer Ausdruck zum Extrahieren einer Zeichenkette sieht wie folgt aus:
 
 ```python
-url = join(link.xpath("@href").extract(), "") 
+url = join(link.xpath("a/@href").extract(), "") 
 ```
 
 Beachten Sie bei der Formulierung von Ausdrücken, dass Sie entweder den Inhalt von Attributen zurück liefern müssen, oder den Inhalt von Elementen. Für den Inhalt von Elementen verwenden Sie bei XPATH-Ausdrücken `elementname/text()` und bei CSS-Ausdrücken `elementname::text` (`elementname` ist der HTMl-Elementname wie `h1` oder `p`). *Wenn Sie diese Ausdrück nicht verwenden, wird das HTML-Element zusammen mit dem Text extrahiert und führt zu unsauberen Daten!*
+
+Beispiel für das Extrahieren des Textes per XPATH und CSS aus einem Element (das Ergebnis in den Variablen `text1` und `text2` ist jeweils das gleiche):
+```python
+text1 = join(link.xpath("a/text()").extract(), "") 
+text2 = join(link.css("a::text").extract(), "") 
+```
 
 ### Items zurückliefern
 Wenn ein Item fertig gestellt ist, liefern Sie es mit dem Schlüsselwort `yield` zurück. Wenn Sie in einer Methode in Unter-Methoden verzweigen, die `yield` benutzen, müssen Sie entweder `return name_der_untermethode()` verwenden oder (besser) folgenden Code:
@@ -86,20 +113,28 @@ for item in name_der_untermethode():
     yield item
 ```
 
-### Items über mehrere Seiten hinweg mit Inhalt füllen
+### <a name="#mehrere_seiten"></a>Items über mehrere Seiten hinweg mit Inhalt füllen
 Es kommt häufiger vor, dass Informationen auf mehreren Seiten verteilt (z.B. bei Personen, bei denen Kontakt-Informationen und Informationen zu Biografie und Publikationen auf verschiedenen Seiten stehen) sind oder Sie für jeden Link auf einer Übersichtsseite eine Detail-Seite aufrufen möchten.
 
-Um eine neue Seite des Webauftritts zu crawlen, erzeugen Sie ein `Request` Objekt und liefern es mit `yield` zurück. Das `Request` Objekt benötigt eine URL. Wenn das Ergebnis des Abrufs nicht von der `parse` Methode verarbeitet werden soll, müssen Sie außerdem den `callback` Parameter verwenden und eine andere Methode zum Verarbeiten der Inhalte angeben. Wenn Sie das aktuell verarbeitete Item in mit weiteren Daten befüllen wollen, müssen Sie außerdem den `meta` Parameter verwenden. Das folgende Beispiel zeigt einen URL-Aufruf mit `callback` und `meta`:
+Um eine neue Seite des Webauftritts zu crawlen, erzeugen Sie ein `Request` Objekt und liefern es mit `yield` zurück. Das `Request` Objekt benötigt die URL neuen Seite. 
+
+Wenn das Ergebnis des Abrufs nicht von der `parse` Methode verarbeitet werden soll, müssen Sie außerdem den `callback` Parameter verwenden und eine andere Methode zum Verarbeiten der Inhalte angeben.
+
+Die neue Methode hat sämtliche gesammelten Daten "vergessen". Wenn Sie das aktuell verarbeitete Item in der neuen Methode benutzen wollen, müssen Sie  den `meta` Parameter verwenden. Das folgende Beispiel zeigt einen URL-Aufruf mit `callback` und `meta`. Die Siete ist eine Übersichtsseite, die Namen von Personen enthält. Die Namen siend Links zu Detail-Seiten.
 
 ```python
-yield Request(url, callback=self.parse_person_details, meta={'person':person} )
+person = Person()
+person['name'] = join(sel.xpath("a/text()").extract(), "")
+url = sel.xpath("a/@href").extract()[0]
+yield Request(url, callback=self.parse_person_details, meta={'person_data':person} )
 ```
 
+`person` ist die Variable, in der die Personendaten gespeichert sind, `person_data` ist der array-Schlüssel für `meta`, mit dem Sie die gesammelten Inhalte später in der neuen Methode `self.parse_person_details` abrufen können.
 In der Methode `parse_person_details` können Sie dann die Daten wie folgt verwenden:
 
 ```python
 def parse_person_details(self, response):
-    person = response.meta['person']
+    person = response.meta['person_data']
     # ...
 ```
 
@@ -109,7 +144,7 @@ Wenn auf einer Seite mehrere Items zu verarbeiten sind, müssen Sie eine `for`-S
 - einen CSS-Selektor-Ausdruck, der mehrere Elemente zurückliefert, mit einer `for`-Schleife durchlaufen
 - für jedes Element ein neues Item erzeugen (in diesem Fall eine Publikation)
 - aus dem aktuellen Element Informationen extrahieren
-- Informationen an die aktuelle URL anfügen, um als sie als eindeutige `source_url` für das Item benutzen zu können.
+- Informationen an die aktuelle URL anfügen, um als sie als *eindeutige* `source_url` für das Item benutzen zu können.
 - das Item mit `yield` zurückliefern
 
 ```python
