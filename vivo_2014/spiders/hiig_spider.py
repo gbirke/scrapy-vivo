@@ -111,6 +111,7 @@ class HiigSpider(Spider):
                     public["endpage"] = pages.group(2)
             elif re.search("Sonstige Publikationen", pubtype):
                 title = split(autoren_und_titel, "\d).")[1] # Hier gibt es einen Fehler, willst du das 1. oder 2. element? Das 1. hat Index 0
+				#ich wollte autoren und titel splitten an der Stelle wo "Ziffer)." steht und den zweiten Element davon nehmen
                 public["title"] = title
                 pub_content_source = pub_content.xpath("em/text()").extract()
                 public["published_in"] = pub_content_source
