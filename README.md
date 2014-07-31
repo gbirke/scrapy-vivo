@@ -61,6 +61,7 @@ Um die Webseite nach Daten zu durchsuchen, benutzt Scrapy eine sogenannte **Spid
 Die Spider-Programme sind im Ordner `spiders` gespeichert. Jede Webseite braucht aufgrund ihrer individuellen HTML-Struktur eine eigene Spider.
 
 Die Items werden nach dem Erzeugen durch die Spider nicht sofort gespeichert, sondern durchlaufen erst noch die **Pipeline**. Dort können sie nachbearbeitet werden. Im konkreten Fall nutzt das Projekt die Pipeline, um eindeutige IDs zu vergeben und die Items ins RDF-Format zu konvertieren.
+**Hinweis** Beachten Sie, dass in python-Syntax Umlaute und ß sogar in Kommentaren nicht erlaubt sind.
 
 ## Aufbau einer Spider
 Eine Spider beginnt immer mit der Deklaration des Namens, der erlaubten Domains (URLs außerhalb der erlaubten Domains werden nicht abgerufen) und der Start-URLs. 
@@ -81,7 +82,7 @@ Um während der Bearbeitung die Ergebnisse nur eines Teils der Webseite zu bekom
 
 Jede Spider muss immer die Methode `parse` enthalten. In unserem Projekt verzweigt sich `parse` in Methoden zum Verarbeiten der Informationen über die Haupt-Organisation und zum Verarbeiten der Abteilungen der Organisation. Diese Methoden beginnen immer mit `parse_`
 
-Die `parse`-Methode und alle folgenden Methoden, die Daten von der Webseite verarbeiten, haben den `response`-Parameter. In dieser Variablen stehen die URL der aktuell verarbeiteten Seite, das HTML der Seite und Meta-Informationen über den Seitenabruf (wird später im Abschnitt "(Items über mehrere Seiten hinweg mit Inhalt füllen)[#mehrere_seiten]" besprochen).
+Die `parse`-Methode und alle folgenden Methoden, die Daten von der Webseite verarbeiten, haben den `response`-Parameter. In dieser Variablen stehen die URL der aktuell verarbeiteten Seite, das HTML der Seite und Meta-Informationen über den Seitenabruf (wird später im Abschnitt "[Items über mehrere Seiten hinweg mit Inhalt füllen](#mehrere-seiten)" besprochen).
 Das folgende Beispiel zeigt, wie `response` verwendet wird, um
 
 - Einen Selektor zu initialisieren
@@ -118,7 +119,7 @@ for item in name_der_untermethode():
     yield item
 ```
 
-### <a name="#mehrere_seiten"></a>Items über mehrere Seiten hinweg mit Inhalt füllen
+### Items über mehrere Seiten hinweg mit Inhalt füllen
 Es kommt häufiger vor, dass Informationen auf mehreren Seiten verteilt (z.B. bei Personen, bei denen Kontakt-Informationen und Informationen zu Biografie und Publikationen auf verschiedenen Seiten stehen) sind oder Sie für jeden Link auf einer Übersichtsseite eine Detail-Seite aufrufen möchten.
 
 Um eine neue Seite des Webauftritts zu crawlen, erzeugen Sie ein `Request` Objekt und liefern es mit `yield` zurück. Das `Request` Objekt benötigt die URL neuen Seite. 
