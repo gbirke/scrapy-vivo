@@ -6,15 +6,16 @@ Dieses Projekt durchsucht Webseiten des Science 2.0 Forschungsverbundes nach Dat
 ### Installation
 Installieren Sie die VirtualBox-Datei `SCRAPY.OVA` in VirtualBox über das Menü "Datei -> Appliance importieren ...". Starten Sie die virtuelle Maschine. Die ersten Meldungen über Maus und Tastatur ignorieren. Benutzername und Passwort: `vagrant`. Während der Eingabe vom Passwort bleibt der Cursor auf einer Stelle.
 
-Danach können Sie sich mit [Putty][5] auf die Kommandozeile der virtuellen Maschine verbinden. Der Host/Severname ist `localhost`, der Port ist `2222`, Benutzername und Passwort sind `vagrant`. Das Einfügen von kopierten Befehlen in die Kommandozeile passiert durch Rechtsklick. Strg+V funktioniert nicht. 
+Nach dem erfolgreichen Login im VirtualBox können Sie sich mit [Putty][5] auf die Kommandozeile der virtuellen Maschine verbinden. Geben Sie im [Putty][5]-Configuration-Fenster den Host/Severname `localhost` ein, der Port ist `2222`. Mit der Schaltfläche "Open" aktivieren Sie die Kommandozeile. Die Angaben sollen entweder  jedes Mal eingegeben, oder können gespeichert werden (Schaltfläche "Save", Namen eingeben). Gespeicherte Einstellungen werden mit  "Load" ausgewählt und dann mit "Open" aktiviert. Benutzername und Passwort sind `vagrant`. Das Einfügen von kopierten Befehlen in die Kommandozeile passiert durch Rechtsklick. Strg+V funktioniert nicht. 
 
 ### Gemeinsamen Ordner einrichten
-Damit Sie die Scraper-Dateien mit einem Editor auf ihrem PC berabeiten können, schalten Sie die Virtuelle Maschine aus und richten Sie einen gemeinsamen Ordner ein. Klicken Sie in der VirtualBox-Oberfläche auf "Gemeinsame Ordner" und das Hinzufügen-Icon. Wählen Sie einen Ordner aus. Unterhalb des Ordner-Namens sehen Sie den Namen des Ordners in der Virtuellen Maschine. Sie können ihn ändern, z.B. auf `scrapy`. "..." anhacken In der folgenden Dokumentation wird der name `scrapy` verwendet. Auf der Virtuellen maschine finden Sie dann denn Ordner unter `/media/sf_scrapy`.
+Damit Sie die Scraper-Dateien mit einem Editor auf ihrem PC berabeiten können, schalten Sie die Virtuelle Maschine aus und richten Sie einen gemeinsamen Ordner ein. Klicken Sie in der VirtualBox-Oberfläche auf "Gemeinsame Ordner" und das Hinzufügen-Icon. Wählen Sie einen Ordner aus. Unterhalb des Ordner-Namens sehen Sie den Namen des Ordners in der Virtuellen Maschine. Sie können ihn ändern, z.B. auf `scrapy`. "Automatisch einbinden" anhacken. In der folgenden Dokumentation wird der name `scrapy` verwendet. Auf der Virtuellen maschine finden Sie dann denn Ordner unter `/media/sf_scrapy`.
 
 Starten Sie die virtuelle Maschine und kopieren Sie die Scrapy-Dateien auf der Kommandozeile mit folgendem Befehl:
 
     cp -r /usr/local/vivo2014/* /media/sf_scrapy
 
+Nach der Installation ist das Letzte nicht mehr notwendig.
 
 ### Scraper aufrufen
 Wechseln Sie auf der Kommandozeile in den Ordner `/media/sf_scrapy` mit folgendem Befehl:
@@ -74,10 +75,12 @@ class HiigSpider(Spider):
         "http://www.hiig.de/publikationen-des-hiig/",
     ]
 ```
-Außerdem muss sie immer die Methode `parse` enthalten. In unserem Projekt verzweigt sich `parse` in Methoden zum Verarbeiten der Informationen über die Haupt-Organisation und zum Verarbeiten der Abteilungen der Organisation. 
 Um während der Bearbeitung die Ergebnisse nur eines Teils der Webseite zu bekommen, könnte man die übrigen URLs auskommentieren.
 
 ### Parse-Methoden
+
+Jede Spider muss immer die Methode `parse` enthalten. In unserem Projekt verzweigt sich `parse` in Methoden zum Verarbeiten der Informationen über die Haupt-Organisation und zum Verarbeiten der Abteilungen der Organisation. Diese Methoden beginnen immer mit `parse_`
+
 Die `parse`-Methode und alle folgenden Methoden, die Daten von der Webseite verarbeiten, haben den `response`-Parameter. In dieser Variablen stehen die URL der aktuell verarbeiteten Seite, das HTML der Seite und Meta-Informationen über den Seitenabruf (wird später im Abschnitt "(Items über mehrere Seiten hinweg mit Inhalt füllen)[#mehrere_seiten]" besprochen).
 Das folgende Beispiel zeigt, wie `response` verwendet wird, um
 
@@ -89,6 +92,8 @@ def parse_person(self, response):
     sel = Selector(response)
     url = response.url
 ```
+
+
 
 ### Daten extrahieren
 Egal ob ein XPATH oder ein CSS-Selektor verwendet wird, am Ende des Ausdrucks muss, wenn Daten erzeugt werden sollen, die Methode `extract()` stehen. Die Methode liefert stets ein Array zurück, auch wenn der Selektor-Ausdruck nur genau einen Inhalt extrahiert. Um das Array in eine Zeichenkette umzuwandeln, verwenden Sie die Funktion `join`. Ein typischer Ausdruck zum Extrahieren einer Zeichenkette sieht wie folgt aus:
