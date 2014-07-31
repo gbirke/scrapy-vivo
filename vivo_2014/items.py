@@ -9,6 +9,7 @@ class Person(Item):
     id = Field()
     source_url = Field()
     name = Field()
+    name_full = Field()
     title = Field()
     email = Field()
     web = Field()
