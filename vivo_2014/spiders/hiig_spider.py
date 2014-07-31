@@ -141,6 +141,13 @@ class HiigSpider(Spider):
             publi["publisher"] = split(pages_and_publisher, ":")[1]
             # publi["publisher"] = split(source[1], ":")[1]
             publi["published_in"] = infotable.xpath("tr[2]/td[2]/span/em/text()").extract()
-            
+        col = sel.css("#secondary") 
+        col_author = col.xpath("ul[1]/li/a/text()").extract()
+        publi["name_full"] = []
+        for single_author in col_author:# als single_author wird jedes Element des Arrays col_author benannt?
+            fullname = single_author.split(",")[0]
+            publi["name_full"].append(fullname) # <TODO name aus author_names entfernen       
+        
+        
         yield publi
         
