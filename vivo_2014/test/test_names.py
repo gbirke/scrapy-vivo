@@ -28,16 +28,16 @@ class NameTest(unittest.TestCase):
         expected = [["John", "Snow"], ["Samwell", "Tarly"]]
         splitter = LastnameFirstnameSplitter(",")
         collection = NameCollection(splitter)
-        result = collection.get_names_list("Snow, John; Tarly, Samwell", ";\s*")
-        self.assertEquals(result, expected)
+        collection.collect("Snow, John; Tarly, Samwell", ";\s*")
+        self.assertEquals(collection.get_names_list(), expected)
 
     def test_name_collection_with_separator_duplication(self):
         expected = [["John", "Snow"], ["Samwell", "Tarly"]]
         splitter = LastnameFirstnameSplitter(",")
         collection = NameCollection(splitter)
-        result = collection.get_names_list("Snow, John;; Tarly, Samwell", ";")
+        result = collection.collect("Snow, John;; Tarly, Samwell", ";").get_names_list()
         self.assertEquals(result, expected)
-        result = collection.get_names_list("Snow, John; ; Tarly, Samwell", ";")
+        result = collection.collect("Snow, John; ; Tarly, Samwell", ";").get_names_list()
         self.assertEquals(result, expected)
 
     def test_name_equivalence(self):

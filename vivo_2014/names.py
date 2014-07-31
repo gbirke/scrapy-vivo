@@ -78,20 +78,25 @@ class NameCollection:
         self.names = []
         self.splitter = splitter
 
-    def get_names(self, names_string, separator=","):
-        name_list = []
+    def collect(self, names_string, separator=","):
+        self.names = []
         for name in re.split(separator, names_string):
             name = name.strip()
             if name:
-                name_list.append(self.splitter.get_name(name))
-        return name_list
+                self.names.append(self.splitter.get_name(name))
+        return self
 
-    def get_names_list(self, names_string, separator=","):
-        return [name.to_list() for name in self.get_names(names_string, separator)]
+    def get_names(self):
+        return self.names
 
-    def has_equivalent(self, name):
+    def get_names_list(self):
+        return [name.to_list() for name in self.names]
+
+    def get_equivalent(self, name):
         for n in self.names:
             if n.is_equivalent(name):
-                return True
-        return False
+                return n
+        return None
 
+    def remove(self, name):
+        self.names.remove(name)

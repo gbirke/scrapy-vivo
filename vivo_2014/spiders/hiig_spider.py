@@ -84,7 +84,7 @@ class HiigSpider(Spider):
             autoren_und_titel = pub_content_texte[0]
             autoren = autoren_und_titel.split("(")[0]
             name_collector = NameCollection(LastnameFirstnameSplitter(","))
-            public["author_names"] = name_collector.get_names_list(autoren, "\.,|&")
+            public["author_names"] = name_collector.collect(autoren, "\.,|&").get_names_list()
             jahreszahl_und_titel = autoren_und_titel.split("(")[1]
             year_match = re.search("([0-9]{4})\)", jahreszahl_und_titel)
             if year_match:
@@ -130,7 +130,7 @@ class HiigSpider(Spider):
         infotable = sel.css("#content").xpath("div/table")
         authors = join(infotable.xpath("tr[1]/td[2]/span/text()").extract(), "")
         name_collector = NameCollection(LastnameFirstnameSplitter(",\s*")) # wie weiss name_collector, fuer welche Spalte er das macht?
-        publi["author_names"] = name_collector.get_names_list(authors, "\.,|&")
+        name_collector.collect(authors, "\.,|&")
         year = join(infotable.xpath("tr[3]/td[2]/span/text()").extract(), "").strip()
         publi["year"] = year
         pubtype = join(infotable.xpath("tr[4]/td[2]/span/text()").extract(), "").strip()
@@ -142,11 +142,16 @@ class HiigSpider(Spider):
             # publi["publisher"] = split(source[1], ":")[1]
             publi["published_in"] = infotable.xpath("tr[2]/td[2]/span/em/text()").extract()
         col = sel.css("#secondary") 
-        col_author = col.xpath("ul[1]/li/a/text()").extract()
-        publi["name_full"] = []
+        col_author = col.xpath("ul[1]/li/a")
+        splitter = FirstnameLastnameSplitter()
+        publi["author_urls"] = []
         for single_author in col_author:# als single_author wird jedes Element des Arrays col_author benannt?
-            fullname = single_author.split(",")[0]
-            publi["name_full"].append(fullname) # <TODO name aus author_names entfernen       
+            name = splitter.get_name(single_author.xpath("text()").extract()[0].split(",")[0])
+            authorname = name_collector.get_equivalent(name)
+            if authorname:
+                name_collector.remove(authorname)
+                publi["author_urls"].append(single_author.xpath("@href").extract()[0])
+        publi["author_names"] = name_collector.get_names_list()
         abstract = sel.css("#content").xpath("div/article")
         abstract_text = join(abstract.xpath("p/text()").extract(), "").strip()
         publi["abstract"] = abstract_text
