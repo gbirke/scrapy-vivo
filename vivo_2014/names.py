@@ -23,6 +23,19 @@ class Name:
     def to_list(self):
         return [self.firstname, self.lastname]
 
+    def is_equivalent(self, other):
+        if self == other:
+            return True
+        elif self.lastname != other.lastname:
+            return False
+        else:
+            my_firstname = re.sub("\\W", "", self.firstname, flags=re.UNICODE)
+            other_firstname = re.sub("\\W", "", other.firstname, flags=re.UNICODE)
+            if len(my_firstname) > len(other_firstname):
+                return re.match(other_firstname, my_firstname)
+            else:
+                return re.match(my_firstname, other_firstname)
+
     @classmethod
     def from_list(cls, name_list):
         return cls(name_list[0], name_list[1])
@@ -75,4 +88,10 @@ class NameCollection:
 
     def get_names_list(self, names_string, separator=","):
         return [name.to_list() for name in self.get_names(names_string, separator)]
+
+    def has_equivalent(self, name):
+        for n in self.names:
+            if n.is_equivalent(name):
+                return True
+        return False
 
