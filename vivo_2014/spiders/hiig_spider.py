@@ -147,7 +147,8 @@ class HiigSpider(Spider):
         for single_author in col_author:# als single_author wird jedes Element des Arrays col_author benannt?
             fullname = single_author.split(",")[0]
             publi["name_full"].append(fullname) # <TODO name aus author_names entfernen       
-        
-        
+        abstract = sel.css("#content").xpath("div/article")
+        abstract_text = join(abstract.xpath("p/text()").extract(), "").strip()
+        publi["abstract"] = abstract_text
         yield publi
         

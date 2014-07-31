@@ -84,6 +84,7 @@ class Publication(Item):
     phrases = Field() # Schlagwoerter
     thesis_type = Field() #fuer die Hochschulschriften
     publication_type = Field() # Publikationstyp (z.B. )
+    abstract = Field() # Beschreibung
     
 
 # Fuer Vortraege s. Know Center
