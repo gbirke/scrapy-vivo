@@ -3,7 +3,7 @@ from scrapy.spider import Spider
 from scrapy.selector import Selector
 from scrapy.http import Request
 
-from vivo_2014.items import Person, Division, DivisionRole, Organization
+from vivo_2014.items import Person, Division, DivisionRole, Organization, Publication
 
 import re
 
@@ -11,7 +11,7 @@ class ZbwSpider(Spider):
     name = "zbw_spider"
     allowed_domains = ["www.zbw.eu"]
     start_urls = [
-       # "http://www.zbw.eu/de/forschung/",
+        "http://www.zbw.eu/de/forschung/",
         "http://www.zbw.eu/de/impressum/"
     ]
 
@@ -114,7 +114,16 @@ class ZbwSpider(Spider):
         # TODO weitere Daten (Beruflicher Hintergrund (CV), Mitgliedschaften, etc)
         # TODO Publikationen (neuer Request)
         yield person
-
+        url = sel.css("#content_main").xpath("div[@class='csc-default box']/p/a/@href").extract()[0]
+        yield Request(self.fix_url(url), callback=self.parse_publications, meta={'person_data':response.url})
+        
+    def parse_publications(self, response):
+        url = response.meta['person_data']
+        public = Publication()
+        public["title"] = "test"
+        public["source_url"] = response.url
+        yield public
+        
     def fix_url(self, url):
         """ Make URL absolute """
         if url[:4] != "http":
