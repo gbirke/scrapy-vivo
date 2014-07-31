@@ -82,7 +82,7 @@ Um während der Bearbeitung die Ergebnisse nur eines Teils der Webseite zu bekom
 
 Jede Spider muss immer die Methode `parse` enthalten. In unserem Projekt verzweigt sich `parse` in Methoden zum Verarbeiten der Informationen über die Haupt-Organisation und zum Verarbeiten der Abteilungen der Organisation. Diese Methoden beginnen immer mit `parse_`
 
-Die `parse`-Methode und alle folgenden Methoden, die Daten von der Webseite verarbeiten, haben den `response`-Parameter. In dieser Variablen stehen die URL der aktuell verarbeiteten Seite, das HTML der Seite und Meta-Informationen über den Seitenabruf (wird später im Abschnitt "[Items über mehrere Seiten hinweg mit Inhalt füllen](#mehrere-seiten)" besprochen).
+Die `parse`-Methode und alle folgenden Methoden, die Daten von der Webseite verarbeiten, haben den `response`-Parameter. In dieser Variablen stehen die URL der aktuell verarbeiteten Seite, das HTML der Seite und Meta-Informationen über den Seitenabruf (wird später im Abschnitt "[Items über mehrere Seiten hinweg mit Inhalt füllen](#items-uber-mehrere-seiten-hinweg-mit-inhalt-fullen)" besprochen).
 Das folgende Beispiel zeigt, wie `response` verwendet wird, um
 
 - Einen Selektor zu initialisieren
