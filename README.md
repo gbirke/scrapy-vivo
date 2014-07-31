@@ -61,6 +61,7 @@ Um die Webseite nach Daten zu durchsuchen, benutzt Scrapy eine sogenannte **Spid
 Die Spider-Programme sind im Ordner `spiders` gespeichert. Jede Webseite braucht aufgrund ihrer individuellen HTML-Struktur eine eigene Spider.
 
 Die Items werden nach dem Erzeugen durch die Spider nicht sofort gespeichert, sondern durchlaufen erst noch die **Pipeline**. Dort können sie nachbearbeitet werden. Im konkreten Fall nutzt das Projekt die Pipeline, um eindeutige IDs zu vergeben und die Items ins RDF-Format zu konvertieren.
+
 **Hinweis** Beachten Sie, dass in python-Syntax Umlaute und ß sogar in Kommentaren nicht erlaubt sind.
 
 ## Aufbau einer Spider
