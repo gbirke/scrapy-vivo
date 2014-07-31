@@ -82,8 +82,8 @@ Um während der Bearbeitung die Ergebnisse nur eines Teils der Webseite zu bekom
 
 Jede Spider muss immer die Methode `parse` enthalten. In unserem Projekt verzweigt sich `parse` in Methoden zum Verarbeiten der Informationen über die Haupt-Organisation und zum Verarbeiten der Abteilungen der Organisation. Diese Methoden beginnen immer mit `parse_`
 
-Die `parse`-Methode und alle folgenden Methoden, die Daten von der Webseite verarbeiten, haben den `response`-Parameter. In dieser Variablen stehen die URL der aktuell verarbeiteten Seite, das HTML der Seite und Meta-Informationen über den Seitenabruf (wird später im Abschnitt "[Items über mehrere Seiten hinweg mit Inhalt füllen](#mehrere-inhalte)" besprochen).
-Das folgende Beispiel zeigt, wie `response` verwendet wird, um
+Die `parse`-Methode und alle folgenden Methoden, die Daten von der Webseite verarbeiten, haben den `response`-Parameter. In dieser Variablen stehen die URL der aktuell verarbeiteten Seite, das HTML der Seite und Meta-Informationen über den Seitenabruf (wird später im Abschnitt "[Mehrere Items Verarbeiten](#mehrere-items-verarbeiten)" besprochen).
+Das folgende Beispiel zeigt, wie `response` verwendet wird, um 
 
 - Einen Selektor zu initialisieren
 - Die akutelle URl der Seite auszulesen
@@ -119,7 +119,7 @@ for item in name_der_untermethode():
     yield item
 ```
 
-### <a href="#mehrere-inhalte">Items über mehrere Seiten hinweg mit Inhalt füllen</a>
+### Items über mehrere Seiten hinweg mit Inhalt füllen
 Es kommt häufiger vor, dass Informationen auf mehreren Seiten verteilt (z.B. bei Personen, bei denen Kontakt-Informationen und Informationen zu Biografie und Publikationen auf verschiedenen Seiten stehen) sind oder Sie für jeden Link auf einer Übersichtsseite eine Detail-Seite aufrufen möchten.
 
 Um eine neue Seite des Webauftritts zu crawlen, erzeugen Sie ein `Request` Objekt und liefern es mit `yield` zurück. Das `Request` Objekt benötigt die URL neuen Seite. 
