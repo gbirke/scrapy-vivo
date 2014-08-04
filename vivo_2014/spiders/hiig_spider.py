@@ -93,7 +93,7 @@ class HiigSpider(Spider):
                 title = split(autoren_und_titel, ").")[1]
                 public["title"] = title
                 pub_content_source = pub_content.xpath("em/text()").extract()
-                public["published_in"] = pub_content_source
+                public["published_in"] = join(pub_content_source, "")
                 public["publication_type"] = "Academic Article"
             elif re.search("B.+cher", pubtype):
                 pub_book_title = join(pub_content.xpath("em/text()").extract(), "")
@@ -103,7 +103,7 @@ class HiigSpider(Spider):
                 titel_und_quelle = split(autoren_und_titel, ").")[1]
                 public["title"] = titel_und_quelle.split("In")[0]
                 source_autoren = titel_und_quelle.split("In")[1]# ob wir das brauchen
-                public["published_in"] = pub_content.xpath("em/text()").extract()
+                public["published_in"] = join(pub_content.xpath("em/text()").extract(), "")
                 pages_and_publisher = pub_content_texte[1]
                 pages_match = re.search("pp.([0-9]+)\-([0-9]+)", pages_and_publisher)
                 if pages_match:
@@ -113,7 +113,7 @@ class HiigSpider(Spider):
                 title = re.split("\d\)\.", autoren_und_titel, 1)[1] # Nur einmal splitten, falls im Titel nochmal Zahl, Klammer Punkt vorkommt
                 public["title"] = title
                 pub_content_source = pub_content.xpath("em/text()").extract()
-                public["published_in"] = pub_content_source
+                public["published_in"] = join(pub_content_source, "")
             else:
                 self.log("UNKNOWN PUBLICATION TYPE!")
                 
