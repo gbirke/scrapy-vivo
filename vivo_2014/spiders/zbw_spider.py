@@ -119,11 +119,17 @@ class ZbwSpider(Spider):
         
     def parse_publications(self, response):
         url = response.meta['person_data']
-        public = Publication()
-        public["title"] = "test"
-        public["source_url"] = response.url
-        yield public
+        sel = Selector(response)
+        for publications in sel.css("#content .csc-default.box li"):
+            publi = Publication()
+            single_title = join(publications.xpath("descendant-or-self::b//text()").extract(),"")
+            publi["title"] = single_title
+            year = join(publications.xpath("descendant-or-self::b/following-sibling::text()[1]").extract(),"")
+            publi["year"] = year
+            publi["source_url"] = response.url # TODO: unique URL
+            yield publi
         
+
     def fix_url(self, url):
         """ Make URL absolute """
         if url[:4] != "http":
