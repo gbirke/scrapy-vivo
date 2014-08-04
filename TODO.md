@@ -1,6 +1,5 @@
 # TODO Scrapy & VIVO
 
-- HTTP-Header so setzen, dass deutsche Seite abgerufen wird
 - Publikationen GESIS
 - Publikationen ZBW
 - Muster-RDF Publikationen

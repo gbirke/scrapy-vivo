@@ -15,6 +15,11 @@ EXPORT_FIELDS = ["name", "title", "position", "email", "phone", "web"]
 
 REDIRECT_ENABLED = True
 
+DEFAULT_REQUEST_HEADERS = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'de-de, de, en;q=0.5',
+}
+
 ITEM_PIPELINES = {
     "vivo_2014.pipelines.Url2IdPipeline": 100,
     "vivo_2014.pipelines.OrganizationAssignmentPipeline": 150,
