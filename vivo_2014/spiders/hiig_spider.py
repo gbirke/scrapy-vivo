@@ -121,7 +121,12 @@ class HiigSpider(Spider):
             url = pub_content.xpath("a/@href").extract()[0]
             public["source_url"] = url
             
-            yield Request(url, callback=self.parse_publication_detail, meta={"publi": public})
+            yield Request(url, 
+                callback=self.parse_publication_detail, 
+                errback=lambda x, public=public: self.error_publication_details(x,public), # See http://stackoverflow.com/questions/12026707/scrapy-if-request-error-then-return-item
+                meta={"publi": public, 'dont_retry':1}, 
+                dont_filter=True
+            )
 
     def parse_publication_detail(self,response):
         publi = response.meta['publi']
@@ -156,4 +161,10 @@ class HiigSpider(Spider):
         abstract_text = join(abstract.xpath("p/text()").extract(), "").strip()
         publi["abstract"] = abstract_text
         yield publi
-        
+    
+    def error_publication_details(self, err, publi):
+        """ If the request to publication details fails, this method is called and 
+            just yields the item that was scraped so far.
+        """
+        yield publi
+
