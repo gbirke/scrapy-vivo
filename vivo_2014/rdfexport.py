@@ -5,6 +5,7 @@ from rdflib.namespace import RDF, RDFS, FOAF
 from rdflib import URIRef, BNode, Literal, XSD
 
 from vivo_2014.items import Person, Division, Organization, Publication
+from vivo_2014.names import Name
 
 MyNamespaces = {
     "LOCAL": rdflib.Namespace("http://vivo.mydomain.edu/individual/"),
@@ -68,7 +69,17 @@ class PersonExporter(BaseExporter):
 
         # TODO get person type and replace the default
         personURL = self._get_entry_url(FOAF.NonFacultyAcademic, id, "p")
-        self.graph.add( (personURL, RDFS.label, Literal(item["name"])) )
+
+        if type(item["name"]) == Name:
+            label = "%s, %s" % (item['name'].lastname, item['name'].firstname)
+            individualNameURL = self._get_entry_url(VCARD.Name, id, "i", "8" )
+            self.graph.add( (individualNameURL, VCARD.familyName, Literal(item["name"].lastname)) )
+            self.graph.add( (individualNameURL, VCARD.givenName, Literal(item["name"].firstname)) )
+            hasName = True
+        else:
+            label = item["name"]
+            hasName = False
+        self.graph.add( (personURL, RDFS.label, Literal(label)) )
 
         hasEmail = False
         if "email" in item and item["email"] != "":
@@ -89,10 +100,12 @@ class PersonExporter(BaseExporter):
             self.graph.add( (individualPhoneURL, VCARD.telephone, Literal(item["phone"])) )
             hasPhone = True
 
-        # TODO Create name and web site
+        # TODO Add web site
         
         individualURL = self._get_entry_url(VCARD.Individual, id, "i")
         self.graph.add( (individualURL, ERO.ARG_2000029, personURL) )
+        if hasName:
+            self.graph.add( (individualURL, VCARD.hasName, individualNameURL) )
         if hasEmail:
             self.graph.add( (individualURL, VCARD.hasEmail, individualEmailURL) )
         if hasPhone:
