@@ -69,7 +69,6 @@ class Url2IdPipeline(object):
 
     def process_item(self, item, spider):
         if item["source_url"] == "":
-            print "Source url is empty!!!"
             return
 
         item_type = item.__class__.__name__

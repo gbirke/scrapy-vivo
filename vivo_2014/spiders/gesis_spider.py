@@ -41,8 +41,9 @@ class GesisSpider(Spider):
         content = sel.css("#col3 .csc-default")
         address = content.xpath("p[1]/text()").extract()
         orga["street_address"]= strip(address[0])
-        orga["postal_code"]= strip(address[1]).split(" ")[0]
-        orga["city"]= strip(address[1]).split(" ")[1]
+        city_and_postal_code = re.split("\s+", strip(address[1]), flags=re.UNICODE) # Space can be a nonbreaking space
+        orga["postal_code"]= city_and_postal_code[0]
+        orga["city"]= city_and_postal_code[1]
         contact = content.xpath("p[2]/text()").extract()
         orga["phone"]= re.search("[-+0-9() ]+",strip(contact[0])).group(0)
         orga["fax"]= re.search("[-+0-9() ]+",strip(contact[1])).group(0)
@@ -72,6 +73,9 @@ class GesisSpider(Spider):
         # TODO: Why is description empty for "Web Science and Web Technologies" and "Web Science and Web Technologies"? debug xpath and fix it
         description = join(division_info.xpath("p//text()|div/p//text()").extract(), "")
         division["description"] = description
+        # The following line does not work because it depends on organization being parsed first, 
+        # which cannot be guaranteed
+        #division["organization_id"] = self.organization["id"]
 
         yield division
 
