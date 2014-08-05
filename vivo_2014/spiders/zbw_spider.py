@@ -4,6 +4,7 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 
 from vivo_2014.items import Person, Division, DivisionRole, Organization, Publication
+from vivo_2014.names import *
 
 import re
 
@@ -72,7 +73,9 @@ class ZbwSpider(Spider):
         # Parse person data
         vcard = sel.css("#content_right .vcard")
         # TODO decode encrypted email address
-        person["name"] = join(vcard.css(".name .fn::text").extract(), "")
+        name = join(vcard.css(".name .fn::text").extract(), "")
+        splitter = FirstnameLastnameSplitter()
+        person["name"] = splitter.get_name(name)
         person["title"] = join(vcard.css(".title::text").extract(), "")
         phone = join(vcard.css(".tel::text").extract(), "")
         phone = re.sub(re.compile(r"^T:\s*", re.U), "", strip(phone)) # Need unicode flag because string contains nonbreaking space
