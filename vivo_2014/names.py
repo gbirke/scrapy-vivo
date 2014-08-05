@@ -5,7 +5,7 @@
 
 import re
 
-class Name:
+class Name(object):
     def __init__(self, firstname, lastname):
         self.firstname = firstname
         self.lastname = lastname
@@ -42,7 +42,7 @@ class Name:
 
 # Split names based on separator. 
 # It's very naive at the moment and does not account for prefixes like "von", "de", etc.
-class AbstractSeparatorNameSplitter:
+class AbstractSeparatorNameSplitter(object):
     def __init__(self, separator=" "):
         self.separator = separator
 
@@ -73,7 +73,7 @@ class LastnameFirstnameSplitter(AbstractSeparatorNameSplitter):
         
 
 
-class NameCollection:
+class NameCollection(object):
     def __init__(self, splitter):
         self.names = []
         self.splitter = splitter
