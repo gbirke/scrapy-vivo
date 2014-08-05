@@ -12,8 +12,8 @@ class HiigSpider(Spider):
     name = "hiig_spider"
     allowed_domains = ["www.hiig.de"]
     start_urls = [
-        #"http://www.hiig.de/institute/organisation/",
-        #"http://www.hiig.de/personen/",
+        "http://www.hiig.de/institute/organisation/",
+        "http://www.hiig.de/personen/",
         "http://www.hiig.de/publikationen-des-hiig/",
     ]
 
@@ -53,9 +53,11 @@ class HiigSpider(Spider):
         full_contact_text = join(contact.xpath("text()").extract(), "");
 
         if name_full.find(",") > -1:
-            person["name"], person["title"] = name_full.split(", ")
+            name, person["title"] = name_full.split(", ")
         else:
-            person["name"] = name_full
+            name = name_full
+        splitter = FirstnameLastnameSplitter()
+        person["name"] = splitter.get_name(name)
 
         # TODO Department und DepartmentRole statt position, wenn position einen Doppelpunkt enthaelt
         # Damit die Departments eindeutig sind und nicht mehrfach erzeugt werden, als source_url fuer Department
