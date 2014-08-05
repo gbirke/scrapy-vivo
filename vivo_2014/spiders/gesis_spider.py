@@ -5,7 +5,7 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 
 from vivo_2014.items import Person, Division, DivisionRole, Organization, Publication
-from vivo_2014.names import NameCollection, LastnameFirstnameSplitter
+from vivo_2014.names import NameCollection, LastnameFirstnameSplitter, FirstnameLastnameSplitter
 
 # We use regular expressions
 import re
@@ -19,9 +19,8 @@ class GesisSpider(Spider):
     name = "gesis_spider"
     allowed_domains = ["www.gesis.org"]
     start_urls = [
+        "http://www.gesis.org/das-institut/adresse-und-anreise/standort-koeln/",
         "http://www.gesis.org/forschung/angewandte-informatik-und-informationswissenschaft/",
-        "http://www.gesis.org/das-institut/adresse-und-anreise/standort-koeln/"
-        #"http://www.gesis.org/en/research/applied-computer-and-information-science/data-mining-und-knowledge-discovery/"
     ]
 
     def parse(self, response):
@@ -82,10 +81,11 @@ class GesisSpider(Spider):
             name = join(contact.xpath("p/strong/a/text()").extract(), "")
             title_match = re.search(r"^((Prof.|Dr.|M.\s*A.)\s*)*", name) # If there are more titles, this will break
             if title_match:
-                person["name"] = name.replace(title_match.group(0), "")
+                name = name.replace(title_match.group(0), "")
                 person["title"] = strip(title_match.group(0))
-            else:
-                person["name"] = name
+            
+            splitter = FirstnameLastnameSplitter()
+            person["name"] = splitter.get_name(name)
 
             moreinfo = join(contact.xpath("p/strong/a/@href").extract(), "")
 
@@ -134,7 +134,7 @@ class GesisSpider(Spider):
         # TODO Ask students for other fields to parse here
 
         yield person
-        
+        return
         # Parse publication list
         sel = Selector(response)
         publications_and_headings = sel.css("#staffPublications").xpath('a[@name]|ul[@class="pubResultList"]')
