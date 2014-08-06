@@ -91,14 +91,15 @@ class Publication(Item):
     thesis_type = Field() #fuer die Hochschulschriften
     publication_type = Field() # Publikationstyp (z.B. )
     abstract = Field() # Beschreibung
+    location = Field() # Veroeffentlichungsort 
     
 
-# Fuer Vortraege s. Know Center
+# Fuer Vortraege s. Know Center und GESIS
 class Lecture(Item):
     id = Field()
     source_url = Field()
     title = Field()
-    location_id = Field()
+    location = Field() # Ortsname
     event_id = Field()
     lecturer_id = Field()
     vispagename = Field()
@@ -109,4 +110,4 @@ class Event(Item):
     id = Field()
     souce_url = Field()
     title = Field()
-    location_id = Field()
+    location = Field()
