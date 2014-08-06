@@ -4,11 +4,18 @@
 # http://doc.scrapy.org/en/latest/topics/items.html
 
 from scrapy.item import Item, Field
+from vivo_2014.names import Name
+
+def serialize_name(name):
+    if type(name) == Name:
+        return name.to_list()
+    else:
+        return name
 
 class Person(Item):
     id = Field()
     source_url = Field()
-    name = Field()
+    name = Field(serializer=serialize_name)
     title = Field()
     email = Field()
     web = Field()
@@ -28,7 +35,7 @@ class Person(Item):
     # TODO: CV, Description, other fields? Ask students
 
     # TODO Use Name class with the right splitters in each person crawler and update the RDF export accordingly
-    pass
+
 
 # Used for divisions of an organization, eg. at http://www.zbw.eu/de/forschung/
 class Division(Item):
