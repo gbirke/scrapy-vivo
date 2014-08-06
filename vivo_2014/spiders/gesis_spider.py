@@ -109,10 +109,10 @@ class GesisSpider(Spider):
         person["email"] = vcard.email.value
         if hasattr(vcard, "tel"):
             person["phone"] = vcard.tel.value
-        address_data = vcard.adr.value.split(";")
-        person["street_address"] = address_data[2]
-        person["city"] = address_data[3]
-        person["postal_code"] = address_data[5]
+        # address_data = vcard.adr.value.split(";")
+        # person["street_address"] = address_data[2]
+        # person["city"] = address_data[3]
+        # person["postal_code"] = address_data[5]
 
         url = response.meta["moreinfo"]
         if url:
@@ -138,7 +138,7 @@ class GesisSpider(Spider):
         # TODO Ask students for other fields to parse here
 
         yield person
-        return
+        #return
         # Parse publication list
         sel = Selector(response)
         publications_and_headings = sel.css("#staffPublications").xpath('a[@name]|ul[@class="pubResultList"]')
@@ -165,9 +165,26 @@ class GesisSpider(Spider):
         matched = re.match("([^(]+)\((\d+)", authors_and_year)
         if matched:
             name_collection = NameCollection(LastnameFirstnameSplitter(","))
-            pub["author_names"] = name_collection.get_names_list(matched.group(1), ";")
+            pub["author_names"] = name_collection.collect(matched.group(1), ";").get_names_list()
             pub["year"] = matched.group(2)
-
+        title_and_source = text.split("):")[1]
+        founded = re.search("In:",title_and_source)
+        ort_datum = re.search(". (\w+),[-.0-9 ]+$", title_and_source, flags=re.UNICODE)
+        if founded:
+            #source_title
+            source = title_and_source.split("In:")[1]
+            source_title = strip(source.split(",")[0])
+            pub["published_in"] = source_title
+            #title
+            title = title_and_source.split("In:")[0]
+            pub["title"] = title
+        elif ort_datum:
+            title_and_source2 = title_and_source.replace(ort_datum.group(0), "")
+            published_in = re.search(".\s*([^.]+)$", title_and_source2).group(1) # published_in - Letzter Satz ohne Ort und Datum
+            title = title_and_source2.replace(published_in, "")
+        else:
+            title = title_and_source.split(".")[0]
+            pub["title"] = title
         # TODO: Fill in title and other information
 
         # Extract DOI and download link (which will be used as source url)
