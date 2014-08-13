@@ -1,3 +1,5 @@
 scrapy
 vobject
 rdflib
+regex
+nose
