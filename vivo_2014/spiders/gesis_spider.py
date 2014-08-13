@@ -3,6 +3,7 @@ from hashlib import md5
 from scrapy.spider import Spider
 from scrapy.selector import Selector
 from scrapy.http import Request
+from scrapy import log
 
 from vivo_2014.items import Person, Division, DivisionRole, Organization, Publication
 from vivo_2014.names import NameCollection, LastnameFirstnameSplitter, FirstnameLastnameSplitter
@@ -152,7 +153,8 @@ class GesisSpider(Spider):
                 for pub_item in item.xpath("li"):
                      publication = self.create_publication(pub_item, current_publication_type, source_url_base)
                      # TODO remove person from publication["author_names"] and set publication["author_ids"] instead.
-                     yield publication
+                     if publication:
+                        yield publication
 
     def create_publication(self, publication_item, publication_type, source_url_base):
         """ Create a publication item from publication_item. 
@@ -167,24 +169,52 @@ class GesisSpider(Spider):
             name_collection = NameCollection(LastnameFirstnameSplitter(","))
             pub["author_names"] = name_collection.collect(matched.group(1), ";").get_names_list()
             pub["year"] = matched.group(2)
-        title_and_source = text.split("):")[1]
-        founded = re.search("In:",title_and_source)
-        ort_datum = re.search(". (\w+),[-.0-9 ]+$", title_and_source, flags=re.UNICODE)
-        if founded:
-            #source_title
-            source = title_and_source.split("In:")[1]
-            source_title = strip(source.split(",")[0])
-            pub["published_in"] = source_title
+        
+        title_and_source = text.split("):", 1)[1]
+        #founded = re.search("In:",title_and_source)
+        if re.search("Monographien|Forschungs- und Arbeitsberichte|Sonstige Ver.+ffentlichungen|Herausgeberwerke", publication_type):
+            title = title_and_source.split(".")[0]
+            pub["title"] = strip(title)
+        elif re.search("Referierte Zeitschriftenaufs.+tze|Sammelwerksbeitr.+ge|Zeitschriftenaufs.+tze", publication_type):
             #title
             title = title_and_source.split("In:")[0]
-            pub["title"] = title
-        elif ort_datum:
-            title_and_source2 = title_and_source.replace(ort_datum.group(0), "")
-            published_in = re.search(".\s*([^.]+)$", title_and_source2).group(1) # published_in - Letzter Satz ohne Ort und Datum
-            title = title_and_source2.replace(published_in, "")
+            pub["title"] = strip(title)
+            #source_title
+            if re.search("(Hrsg.)",title_and_source):
+                source = title_and_source.split("):")[1]# Quelle mit allen Angaben ohne Herausgebernamen
+                # source_title = source.split(",")[1]   -macht kein Sinn, da manche Titel auch Kommas enthalten
+                pub["published_in"] = strip(source)
+                # pub["published_in"] = source_title   - waere in der Kombination mit der vorherigen Kommentar-Zeile
+            else:
+                source = title_and_source.split("In:")[1]
+                source_title = strip(source.split(",")[0])
+                pub["published_in"] = strip(source_title)
+                
+        elif re.search("Vortr.+ge und Veranstaltungen", publication_type):
+            #datum = re.search("(((\d{2}\.\s*)?\d{2}\.?\s*-\s*)?(\d{2}\.\s*)?(\d{2}\.?|Januar|Februar|M.+rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\s*|[WS]S (\d{4}/)?)?\d{4}[.\s]+$", title_and_source, flags=re.UNICODE)
+            title_and_source2 = re.sub("(((\d{2}\.\s*)?\d{2}\.?\s*-\s*)?(\d{2}\.\s*)?(\d{1,2}\.?|Januar|Februar|M.+rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\s*|[WS]S (\d{4}/)?)?\d{4}[.\s]+$", "", title_and_source)# title_and_source ohne Datum am Ende
+            loc_found = re.search("([^.]+?)[\s.,]+$", title_and_source2)
+            if loc_found:
+                loc = loc_found.group(1)#Ort
+                title_and_source3 = title_and_source2.replace(loc_found.group(0), "") # Letzter Satz ohne Ort und Datum
+                pub["location"] = loc
+            else:
+                self.log("loc not found in '%s' url %s" % (title_and_source2, source_url_base), log.WARNING)
+                return
+            #title_and_source3 = re.sub("([^.]+?)[\s.,]+$", "", title_and_source2)
+            published_in_found = re.search(".\s*([^.]+)\.?$", title_and_source3)
+            if published_in_found:
+                published_in = published_in_found.group(1) #Titel der Quelle
+                title = title_and_source3.replace(published_in_found.group(0), "")# Titel der Publikation
+                pub["published_in"] = strip(published_in)          
+            else:
+                self.log("pulished in not found in '%s' for url %s" % (title_and_source3, source_url_base), log.WARNING)
+                return
+            pub["title"] = strip(title)
+            
+            
         else:
-            title = title_and_source.split(".")[0]
-            pub["title"] = title
+            self.log("UNKNOWN PUBLICATION TYPE! Type=%s" % publication_type)
         # TODO: Fill in title and other information
 
         # Extract DOI and download link (which will be used as source url)
