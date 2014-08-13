@@ -109,6 +109,8 @@ class GesisSpider(Spider):
         person["email"] = vcard.email.value
         if hasattr(vcard, "tel"):
             person["phone"] = vcard.tel.value
+
+        # TODO there was an error here - fix it!
         # address_data = vcard.adr.value.split(";")
         # person["street_address"] = address_data[2]
         # person["city"] = address_data[3]
