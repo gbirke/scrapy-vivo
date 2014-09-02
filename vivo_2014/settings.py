@@ -6,6 +6,8 @@
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #
 
+from vivo_2014.extensions import MultiFeedExporter
+
 BOT_NAME = 'vivo_2014'
 
 SPIDER_MODULES = ['vivo_2014.spiders']
@@ -25,6 +27,14 @@ ITEM_PIPELINES = {
     "vivo_2014.pipelines.OrganizationAssignmentPipeline": 150,
     "vivo_2014.pipelines.Item2RDFPipeline": 800
 }
+
+EXTENSIONS = {
+    'scrapy.contrib.feedexport.FeedExporter': None,
+    'vivo_2014.extensions.MultiFeedExporter': 500,
+}
+
+MULTIFEEDEXPORTER_ITEMS = MultiFeedExporter.get_bot_items(BOT_NAME)
+
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
