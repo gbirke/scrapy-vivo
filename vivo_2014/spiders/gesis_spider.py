@@ -1,4 +1,5 @@
 from string import join, strip
+from urlparse import urljoin
 from hashlib import md5
 from scrapy.spider import Spider
 from scrapy.selector import Selector
@@ -56,7 +57,7 @@ class GesisSpider(Spider):
         sel = Selector(response)
         for link in sel.css("#c12546 li a"): 
             url = join(link.xpath("@href").extract(), "") 
-            url = self.fix_url(url)
+            url = self.fix_url(url, response.url)
             yield Request(url, callback=self.parse_research)
 
     def parse_research(self, response):
@@ -233,8 +234,14 @@ class GesisSpider(Spider):
             pub["source_url"] = source_url_base + md5(text.encode('utf-8')).hexdigest()
         return pub
 
-    def fix_url(self, url):
+    def fix_url(self, url, current_url=""):
         """ Make URL absolute """
-        if url[:4] != "http":
-            url = "http://www.gesis.org/" + url
-        return url
+        if url[:4] == "http":
+            self.log("url is not relative")
+            return url
+        elif current_url and url[:3] == "../":
+            self.log("url is relative, ")
+            return urljoin(current_url, url)
+        else:
+            return urljoin("http://www.gesis.org/" , url)
+
