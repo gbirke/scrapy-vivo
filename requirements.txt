@@ -3,3 +3,4 @@ vobject
 rdflib
 regex
 nose
+scrapy-multifeedexporter

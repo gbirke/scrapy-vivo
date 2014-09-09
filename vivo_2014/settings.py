@@ -6,7 +6,7 @@
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #
 
-from vivo_2014.extensions import MultiFeedExporter
+from multifeedexporter import MultiFeedExporter
 
 BOT_NAME = 'vivo_2014'
 
@@ -30,7 +30,7 @@ ITEM_PIPELINES = {
 
 EXTENSIONS = {
     'scrapy.contrib.feedexport.FeedExporter': None,
-    'vivo_2014.extensions.MultiFeedExporter': 500,
+    'multifeedexporter.MultiFeedExporter':500
 }
 
 MULTIFEEDEXPORTER_ITEMS = MultiFeedExporter.get_bot_items(BOT_NAME)
