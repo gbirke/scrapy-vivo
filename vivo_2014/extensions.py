@@ -38,8 +38,7 @@ class MultiFeedExporter(FeedExporter):
             self.item2uri[item_name] = uri
 
     def close_spider(self, spider):
-        deferred = defer.Deferred()
-        stores_waiting = 0
+        deferreds = []
         for uri in self.slots:
             slot = self.slots[uri]
             if not slot.itemcount and not self.store_empty:
@@ -48,13 +47,13 @@ class MultiFeedExporter(FeedExporter):
             logfmt = "%%s %s feed (%d items) in: %s" % (self.format, \
                 slot.itemcount, slot.uri)
             d = defer.maybeDeferred(slot.storage.store, slot.file)
-            d.addCallback(lambda _: log.msg(logfmt % "Stored", spider=spider))
+            d.addCallback(lambda _,logfmt=logfmt: log.msg(logfmt % "Stored", spider=spider))
             d.addErrback(log.err, logfmt % "Error storing", spider=spider)
-            if not d.called:
-                deferred.chainDeferred(d)
-                stores_waiting += 1
-        if stores_waiting:
-            return deferred
+            deferreds.append(d)
+        
+        if deferreds:
+            return defer.DeferredList(deferreds)
+
 
     def item_scraped(self, item, spider):
         item_name = type(item).__name__
