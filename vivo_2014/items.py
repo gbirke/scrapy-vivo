@@ -8,14 +8,17 @@ from vivo_2014.names import Name
 
 def serialize_name(name):
     if type(name) == Name:
-        return name.to_list()
+        return "%s" % name
     else:
         return name
+
 
 class Person(Item):
     id = Field()
     source_url = Field()
     name = Field(serializer=serialize_name)
+    firstname = Field()
+    lastname = Field()
     title = Field()
     email = Field()
     web = Field()
@@ -35,6 +38,11 @@ class Person(Item):
     # TODO: CV, Description, other fields? Ask students
 
     # TODO Use Name class with the right splitters in each person crawler and update the RDF export accordingly
+
+    def set_name(self, name):
+        self["name"] = name
+        self["firstname"] = name.firstname
+        self["lastname"]  = name.lastname
 
 
 # Used for divisions of an organization, eg. at http://www.zbw.eu/de/forschung/

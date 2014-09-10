@@ -6,6 +6,7 @@
 import re
 
 class Name(object):
+    format_string = "%(lastname)s, %(firstname)s"
     def __init__(self, firstname, lastname):
         self.firstname = firstname
         self.lastname = lastname
@@ -19,6 +20,9 @@ class Name(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __repr__(self):
+        return Name.format_string % self.__dict__
 
     def to_list(self):
         return [self.firstname, self.lastname]

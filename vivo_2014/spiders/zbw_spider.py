@@ -75,7 +75,7 @@ class ZbwSpider(Spider):
         # TODO decode encrypted email address
         name = join(vcard.css(".name .fn::text").extract(), "")
         splitter = FirstnameLastnameSplitter()
-        person["name"] = splitter.get_name(name)
+        person.set_name(splitter.get_name(name))
         person["title"] = join(vcard.css(".title::text").extract(), "")
         phone = join(vcard.css(".tel::text").extract(), "")
         phone = re.sub(re.compile(r"^T:\s*", re.U), "", strip(phone)) # Need unicode flag because string contains nonbreaking space

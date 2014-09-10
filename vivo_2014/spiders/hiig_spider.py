@@ -57,7 +57,7 @@ class HiigSpider(Spider):
         else:
             name = name_full
         splitter = FirstnameLastnameSplitter()
-        person["name"] = splitter.get_name(name)
+        person.set_name(splitter.get_name(name))
 
         # TODO Department und DepartmentRole statt position, wenn position einen Doppelpunkt enthaelt
         # Damit die Departments eindeutig sind und nicht mehrfach erzeugt werden, als source_url fuer Department

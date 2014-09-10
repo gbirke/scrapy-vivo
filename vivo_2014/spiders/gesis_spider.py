@@ -91,7 +91,7 @@ class GesisSpider(Spider):
                 person["title"] = strip(title_match.group(0))
             
             splitter = FirstnameLastnameSplitter()
-            person["name"] = splitter.get_name(name)
+            person.set_name(splitter.get_name(name))
 
             moreinfo = join(contact.xpath("p/strong/a/@href").extract(), "")
 
