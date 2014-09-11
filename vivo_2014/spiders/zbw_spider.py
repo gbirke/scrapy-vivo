@@ -116,7 +116,6 @@ class ZbwSpider(Spider):
                 person["position"] = positions
 
         # TODO weitere Daten (Beruflicher Hintergrund (CV), Mitgliedschaften, etc)
-        # TODO Publikationen (neuer Request)
         yield person
         url = sel.css("#content_main").xpath("div[@class='csc-default box']/p/a/@href").extract()[0]
         yield Request(self.fix_url(url), callback=self.parse_publications, meta={'person_data':response.url})
@@ -130,6 +129,7 @@ class ZbwSpider(Spider):
             publi["title"] = single_title
             year = join(publications.xpath("descendant-or-self::b/following-sibling::text()[1]").extract(),"")
             publi["year"] = year
+            # We could extract much more here if the formats on the page were not so inconsistent
             publi["source_url"] = urljoin(response.url, "#%16X" % abs(hash(tuple(publi.items()))))
             yield publi
         
