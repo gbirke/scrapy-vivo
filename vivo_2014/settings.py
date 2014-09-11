@@ -25,7 +25,7 @@ DEFAULT_REQUEST_HEADERS = {
 ITEM_PIPELINES = {
     "vivo_2014.pipelines.Url2IdPipeline": 100,
     "vivo_2014.pipelines.OrganizationAssignmentPipeline": 150,
-    "vivo_2014.pipelines.Item2RDFPipeline": 800
+#    "vivo_2014.pipelines.Item2RDFPipeline": 800
 }
 
 EXTENSIONS = {
