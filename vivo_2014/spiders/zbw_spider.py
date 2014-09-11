@@ -1,4 +1,5 @@
 from string import join, strip
+from urlparse import urljoin
 from scrapy.spider import Spider
 from scrapy.selector import Selector
 from scrapy.http import Request
@@ -129,12 +130,12 @@ class ZbwSpider(Spider):
             publi["title"] = single_title
             year = join(publications.xpath("descendant-or-self::b/following-sibling::text()[1]").extract(),"")
             publi["year"] = year
-            publi["source_url"] = response.url # TODO: unique URL
+            publi["source_url"] = urljoin(response.url, "#%16X" % abs(hash(tuple(publi.items()))))
             yield publi
         
 
     def fix_url(self, url):
         """ Make URL absolute """
         if url[:4] != "http":
-            url = "http://www.zbw.eu" + url
+            url = urljoin("http://www.zbw.eu", url)
         return url
