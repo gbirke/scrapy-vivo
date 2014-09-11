@@ -3,7 +3,6 @@
 - Publikationen GESIS
 - Zuordnung Organisation und Abteilung GESIS - Zuorndung nach ähnlichem Mechanismus wie Department_Role.
 - Publikationen ZBW
-- Muster-RDF Publikationen
 - RDF-Export Publikationen
 - Scraping von KnowCenter-JSON
 - VIVO mit deutschen Übersetzungen anlegen
