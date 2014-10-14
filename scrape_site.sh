@@ -1,11 +1,9 @@
 #!/bin/sh
 
 NAME=$1
+OUTPUT_DIR=/home/birkeg/opensciencelab/vivo-toolchain/trunk/var
 
 GLOB="${NAME}*.csv"
-if test -n "$(find . -maxdepth 1 -name '$GLOB' -print -quit)";then
-    rm -f /home/birkeg/tmp/scraperesult/csv/$GLOB
-fi
- 
+find $OUTPUT_DIR -maxdepth 1 -name "$GLOB" -delete
 
-scrapy crawl -o "/home/birkeg/tmp/scraperesult/csv/${NAME}_%(item_name)s.csv" -t csv "${NAME}_spider"
+scrapy crawl -o "$OUTPUT_DIR/${NAME}_%(item_name)s.csv" -t csv "${NAME}_spider"

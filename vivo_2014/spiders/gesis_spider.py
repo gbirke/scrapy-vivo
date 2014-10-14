@@ -12,8 +12,6 @@ from vivo_2014.names import NameCollection, LastnameFirstnameSplitter, Firstname
 # We use regular expressions
 import re
 
-
-
 # We use VCard parsing
 import vobject
 
@@ -72,7 +70,6 @@ class GesisSpider(Spider):
 
         division["source_url"] = response.url
         division["name"] = join(division_info.css("h1::text").extract(), "")
-        # TODO: Why is description empty for "Web Science and Web Technologies" and "Web Science and Web Technologies"? debug xpath and fix it
         description = join(division_info.xpath("p//text()|div/p//text()").extract(), "")
         division["description"] = description
         # The following line does not work because it depends on organization being parsed first, 
@@ -95,37 +92,13 @@ class GesisSpider(Spider):
 
             moreinfo = join(contact.xpath("p/strong/a/@href").extract(), "")
 
-            links = contact.xpath("p/a/@href").extract()
-            for l in links:
-                if l.find("vcard.php") > -1:
-                    url = self.fix_url(l)
-                    yield Request(url, callback=self.parse_vcard, meta={
-                        'person': person, 
-                        'moreinfo': self.fix_url(moreinfo),
-                        'division_url': response.url
-                        })
-
-    def parse_vcard(self, response):
-        person = response.meta["person"]
-        vcard = vobject.readOne(response.body)
-        person["email"] = vcard.email.value
-        if hasattr(vcard, "tel"):
-            person["phone"] = vcard.tel.value
-
-        # TODO there was an error here - fix it!
-        # address_data = vcard.adr.value.split(";")
-        # person["street_address"] = address_data[2]
-        # person["city"] = address_data[3]
-        # person["postal_code"] = address_data[5]
-
-        url = response.meta["moreinfo"]
-        if url:
-            yield Request(url, callback=self.parse_person, meta={
-                'person': person,
-                'division_url': response.meta['division_url']
-                })
-        else:
-            yield person
+            if moreinfo:
+                yield Request(self.fix_url(moreinfo), callback=self.parse_person, meta={
+                    'person': person,
+                    'division_url': division["source_url"]
+                    })
+            else:
+                yield person
 
     def parse_person(self, response):
         person = response.meta["person"]
@@ -137,12 +110,12 @@ class GesisSpider(Spider):
         division_role["name"] = "Leiter" # ACHTUNG Hartcodierung
         division_role["person_url"] = response.url
         division_role["division_url"] = response.meta["division_url"]
-        person["division_role"] = division_role
+        yield division_role
 
         # TODO Ask students for other fields to parse here
 
         yield person
-        #return
+        # return # for debugging purposes when publications are not needed
         # Parse publication list
         sel = Selector(response)
         publications_and_headings = sel.css("#staffPublications").xpath('a[@name]|ul[@class="pubResultList"]')
@@ -166,22 +139,22 @@ class GesisSpider(Spider):
         # TODO check publication_type with regex and create different items than just Publication
         pub = Publication()
         text = publication_item.xpath("text()").extract()[0]
-        authors_and_year = text.split(":")[0]
+        authors_and_year, title_and_source = text.split(":", 1)
         matched = re.match("([^(]+)\((\d+)", authors_and_year)
         if matched:
             name_collection = NameCollection(LastnameFirstnameSplitter(","))
             pub["author_names"] = name_collection.collect(matched.group(1), ";").get_names_list()
             pub["year"] = matched.group(2)
         
-        title_and_source = text.split("):", 1)[1]
-        #founded = re.search("In:",title_and_source)
         if re.search("Monographien|Forschungs- und Arbeitsberichte|Sonstige Ver.+ffentlichungen|Herausgeberwerke", publication_type):
             title = title_and_source.split(".")[0]
             pub["title"] = strip(title)
+            pub["publication_type"] = "Academic Article"
         elif re.search("Referierte Zeitschriftenaufs.+tze|Sammelwerksbeitr.+ge|Zeitschriftenaufs.+tze", publication_type):
             #title
             title = title_and_source.split("In:")[0]
             pub["title"] = strip(title)
+            pub["publication_type"] = "Article"
             #source_title
             if re.search("(Hrsg.)",title_and_source):
                 source = title_and_source.split("):")[1]# Quelle mit allen Angaben ohne Herausgebernamen
@@ -197,6 +170,7 @@ class GesisSpider(Spider):
             #datum = re.search("(((\d{2}\.\s*)?\d{2}\.?\s*-\s*)?(\d{2}\.\s*)?(\d{2}\.?|Januar|Februar|M.+rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\s*|[WS]S (\d{4}/)?)?\d{4}[.\s]+$", title_and_source, flags=re.UNICODE)
             title_and_source2 = re.sub("(((\d{2}\.\s*)?\d{2}\.?\s*-\s*)?(\d{2}\.\s*)?(\d{1,2}\.?|Januar|Februar|M.+rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\s*|[WS]S (\d{4}/)?)?\d{4}[.\s]+$", "", title_and_source)# title_and_source ohne Datum am Ende
             loc_found = re.search("([^.]+?)[\s.,]+$", title_and_source2)
+            pub["publication_type"] = "Conference Paper"
             if loc_found:
                 loc = loc_found.group(1)#Ort
                 title_and_source3 = title_and_source2.replace(loc_found.group(0), "") # Letzter Satz ohne Ort und Datum
@@ -218,7 +192,6 @@ class GesisSpider(Spider):
             
         else:
             self.log("UNKNOWN PUBLICATION TYPE! Type=%s" % publication_type)
-        # TODO: Fill in title and other information
 
         # Extract DOI and download link (which will be used as source url)
         doi_proxy_url = "http://dx.doi.org/"
@@ -231,16 +204,17 @@ class GesisSpider(Spider):
 
         # If there is no download link, create a unique ID from the text
         if "source_url" not in pub:
-            pub["source_url"] = source_url_base + md5(text.encode('utf-8')).hexdigest()
+            if "doi" in pub:
+                pub["source_url"] = pub["doi"]
+            else:
+                pub["source_url"] = source_url_base + md5(text.encode('utf-8')).hexdigest()
         return pub
 
     def fix_url(self, url, current_url=""):
         """ Make URL absolute """
         if url[:4] == "http":
-            self.log("url is not relative")
             return url
         elif current_url and url[:3] == "../":
-            self.log("url is relative, ")
             return urljoin(current_url, url)
         else:
             return urljoin("http://www.gesis.org/" , url)

@@ -14,7 +14,6 @@ def serialize_name(name):
 
 
 class Person(Item):
-    id = Field()
     source_url = Field()
     name = Field(serializer=serialize_name)
     firstname = Field()
@@ -32,7 +31,7 @@ class Person(Item):
     person_type = Field() # TODO: Where does this come from? Must be from class group "People", should default to "Person"
     position = Field()
     department = Field() # Should this be a reference? Should the Department belong to Organization?
-    organization_id = Field() # Reference to Organization
+    organization_url = Field() # Reference to Organization
     division_role = Field() # Division Role
     
     # TODO: CV, Description, other fields? Ask students
@@ -47,7 +46,6 @@ class Person(Item):
 
 # Used for divisions of an organization, eg. at http://www.zbw.eu/de/forschung/
 class Division(Item):
-    id = Field()
     source_url = Field()
     name = Field()
     description = Field()
@@ -55,17 +53,13 @@ class Division(Item):
     organization_id = Field()
 
 class DivisionRole(Item):
-    id = Field()
     source_url = Field()
     name = Field()
     division_url = Field()
     person_url = Field()
-    division_id = Field()
-    person_id = Field()
 
 # Used for one organization like GESIS or ZBW
 class Organization(Item):
-    id = Field()
     source_url = Field()
     name = Field()
     description = Field()
@@ -79,7 +73,6 @@ class Organization(Item):
     email = Field()   
 
 class Publication(Item):
-    id = Field()
     source_url = Field()
     title = Field()
     publication_date = Field() # komplettes Erscheinungsdatum, wenn vorhanden
@@ -104,7 +97,6 @@ class Publication(Item):
 
 # Fuer Vortraege s. Know Center und GESIS
 class Lecture(Item):
-    id = Field()
     source_url = Field()
     title = Field()
     location = Field() # Ortsname
@@ -115,7 +107,6 @@ class Lecture(Item):
 
 #Fuer Konferenzen
 class Event(Item):
-    id = Field()
     souce_url = Field()
     title = Field()
     location = Field()

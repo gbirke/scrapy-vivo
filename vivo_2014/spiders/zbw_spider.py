@@ -93,7 +93,7 @@ class ZbwSpider(Spider):
         division_role["name"] = "Leiter" # ACHTUNG Hartcodierung
         division_role["person_url"] = url
         division_role["division_url"] = response.url
-        person["division_role"] = division_role
+        yield division_role
 
         yield Request(url, callback=self.parse_person, meta={'person': person})
 
