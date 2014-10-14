@@ -115,37 +115,34 @@ class GesisSpider(Spider):
         # TODO Ask students for other fields to parse here
 
         yield person
-        # return # for debugging purposes when publications are not needed
+        return # Don't do publications while the parsing is broken
         # Parse publication list
         sel = Selector(response)
-        publications_and_headings = sel.css("#staffPublications").xpath('a[@name]|ul[@class="pubResultList"]')
+        publications_list = sel.css(".gs_publication > .gs_publication_list .gs_publication_list")
         current_publication_type = None
         source_url_base = response.url.split("#")[0] + "#" # Remove fragment (regardless if it exists) and add fragment separator
-        for item in publications_and_headings:
-            tag_name = join(item.xpath("name()").extract(), "")
-            if tag_name == "a":
-                current_publication_type = join(item.xpath("h3/text()").extract(), "")
-            elif tag_name == "ul":
-                for pub_item in item.xpath("li"):
-                     publication = self.create_publication(pub_item, current_publication_type, source_url_base)
-                     # TODO remove person from publication["author_names"] and set publication["author_ids"] instead.
-                     if publication:
-                        yield publication
+        for item in publications_list:
+            current_publication_type = join(item.xpath("h3/text()").extract(), "")
+            for pub_item in item.xpath("p"):
+                 publication = self.create_publication(pub_item, current_publication_type, source_url_base)
+                 # TODO remove person from publication["author_names"] and set publication["author_ids"] instead.
+                 if publication:
+                    yield publication
 
     def create_publication(self, publication_item, publication_type, source_url_base):
         """ Create a publication item from publication_item. 
             Which type of publication is created, is determined by publication_type
         """
-        # TODO check publication_type with regex and create different items than just Publication
         pub = Publication()
         text = publication_item.xpath("text()").extract()[0]
-        authors_and_year, title_and_source = text.split(":", 1)
-        matched = re.match("([^(]+)\((\d+)", authors_and_year)
-        if matched:
-            name_collection = NameCollection(LastnameFirstnameSplitter(","))
+        authors_and_year = re.match("(^(.+?)(\d{})", text)
+        # TODO 
+        if authors_and_year:
+            # TODO Parse the new name format with lastname, firstname and firstname lastname, all mixed and separated by commas
+            name_collection = NameCollection(LastnameFirstnameSplitter(",")) 
             pub["author_names"] = name_collection.collect(matched.group(1), ";").get_names_list()
             pub["year"] = matched.group(2)
-        
+        # TODO remove author and year from text and assign it to title_and_source
         if re.search("Monographien|Forschungs- und Arbeitsberichte|Sonstige Ver.+ffentlichungen|Herausgeberwerke", publication_type):
             title = title_and_source.split(".")[0]
             pub["title"] = strip(title)
