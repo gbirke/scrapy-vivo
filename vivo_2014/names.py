@@ -6,7 +6,7 @@
 import re
 
 class Name(object):
-    format_string = "%(lastname)s, %(firstname)s"
+    format_string = "{lastname}, {firstname}"
     def __init__(self, firstname, lastname):
         self.firstname = firstname
         self.lastname = lastname
@@ -22,7 +22,8 @@ class Name(object):
         return not self.__eq__(other)
 
     def __repr__(self):
-        return Name.format_string % self.__dict__
+        values = {k: self.__dict__[k].encode("utf-8") for k in self.__dict__}
+        return Name.format_string.format(**values)
 
     def to_list(self):
         return [self.firstname, self.lastname]

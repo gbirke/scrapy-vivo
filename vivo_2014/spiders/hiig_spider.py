@@ -86,11 +86,12 @@ class HiigSpider(Spider):
             autoren_und_titel = pub_content_texte[0]
             autoren = autoren_und_titel.split("(")[0]
             name_collector = NameCollection(LastnameFirstnameSplitter(","))
-            public["author_names"] = name_collector.collect(autoren, "\.,|&").get_names_list()
+            public["author_names"] = name_collector.collect(autoren, "\.,|&").get_names()
             jahreszahl_und_titel = autoren_und_titel.split("(")[1]
             year_match = re.search("([0-9]{4})\)", jahreszahl_und_titel)
             if year_match:
                 public["year"] = year_match.group(1)
+
             if re.search("Wissenschaftliche Artikel", pubtype):
                 title = split(autoren_und_titel, ").")[1]
                 public["title"] = title
@@ -108,6 +109,7 @@ class HiigSpider(Spider):
                 public["published_in"] = join(pub_content.xpath("em/text()").extract(), "")
                 pages_and_publisher = pub_content_texte[1]
                 pages_match = re.search("pp.([0-9]+)\-([0-9]+)", pages_and_publisher)
+                public["publication_type"] = "Article"
                 if pages_match:
                     public["startpage"] = pages.group(1)
                     public["endpage"] = pages.group(2)
@@ -141,7 +143,9 @@ class HiigSpider(Spider):
         year = join(infotable.xpath("tr[3]/td[2]/span/text()").extract(), "").strip()
         publi["year"] = year
         pubtype = join(infotable.xpath("tr[4]/td[2]/span/text()").extract(), "").strip()
-        publi["publication_type"] = pubtype
+        if "publication_type" not in publi:
+            publi["publication_type"] = pubtype
+
         if re.search("Buchbeitr.+ge", pubtype):
             source = infotable.xpath("tr[2]/td[2]/span/text()").extract()
             pages_and_puplisher = source[1]

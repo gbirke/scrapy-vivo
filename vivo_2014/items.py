@@ -8,10 +8,12 @@ from vivo_2014.names import Name
 
 def serialize_name(name):
     if type(name) == Name:
-        return "%s" % name
+        return str(name)
     else:
-        return name
+        return name.encode('utf-8')
 
+def serialize_author_names(names):
+    return [str(n) for n in names]
 
 class Person(Item):
     source_url = Field()
@@ -78,7 +80,7 @@ class Publication(Item):
     publication_date = Field() # komplettes Erscheinungsdatum, wenn vorhanden
     year = Field()# Erscheinungsjahr
     author_urls = Field() # Liste der Autoren, die auch als Person gespeichert wurden (source_url der Person)
-    author_names = Field() #Autornamen (Array), die einfach nur als Autoren in VIVO gespeichert werden. Muss noch nachbearbeitet werden
+    author_names = Field(serializer=serialize_author_names) #Autornamen (Array), die einfach nur als Autoren in VIVO gespeichert werden. Muss noch nachbearbeitet werden
     publication_location = Field() # In welchem Land/Stadt wurde die Veroeffentlichung publiziert
     published_in = Field() # Name des Journals / Events / etc.
     publisher = Field()#Herausgeber / verlag
