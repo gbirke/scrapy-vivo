@@ -162,7 +162,7 @@ class HiigSpider(Spider):
             if authorname:
                 name_collector.remove(authorname)
                 publi["author_urls"].append(single_author.xpath("@href").extract()[0])
-        publi["author_names"] = name_collector.get_names_list()
+        publi["author_names"] = name_collector.get_names()
         abstract = sel.css("#content").xpath("div/article")
         abstract_text = join(abstract.xpath("p/text()").extract(), "").strip()
         publi["abstract"] = abstract_text

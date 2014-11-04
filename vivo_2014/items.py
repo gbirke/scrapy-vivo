@@ -3,6 +3,9 @@
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/items.html
 
+import json
+import pprint
+
 from scrapy.item import Item, Field
 from vivo_2014.names import Name
 
@@ -13,7 +16,11 @@ def serialize_name(name):
         return name.encode('utf-8')
 
 def serialize_author_names(names):
-    return [str(n) for n in names]
+    """ Convert Name objects to firstname, lastname lists and export the nested list to JSON"""
+    return serialize_to_json([n.to_list() for n in names])
+
+def serialize_to_json(value):
+    return json.dumps(value)
 
 class Person(Item):
     source_url = Field()
@@ -79,7 +86,7 @@ class Publication(Item):
     title = Field()
     publication_date = Field() # komplettes Erscheinungsdatum, wenn vorhanden
     year = Field()# Erscheinungsjahr
-    author_urls = Field() # Liste der Autoren, die auch als Person gespeichert wurden (source_url der Person)
+    author_urls = Field(serializer=serialize_to_json) # Liste der Autoren, die auch als Person gespeichert wurden (source_url der Person)
     author_names = Field(serializer=serialize_author_names) #Autornamen (Array), die einfach nur als Autoren in VIVO gespeichert werden. Muss noch nachbearbeitet werden
     publication_location = Field() # In welchem Land/Stadt wurde die Veroeffentlichung publiziert
     published_in = Field() # Name des Journals / Events / etc.
@@ -89,6 +96,7 @@ class Publication(Item):
     endpage = Field() #Endseite
     volume = Field() #Band
     issue = Field() #Heft
+    download_link = Field() # Wo die Publikation runtergeladen werden kann
     doi = Field() # Digital Object Identifier
     phrases = Field() # Schlagwoerter
     thesis_type = Field() #fuer die Hochschulschriften

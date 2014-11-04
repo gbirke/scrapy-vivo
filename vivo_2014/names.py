@@ -53,7 +53,7 @@ class AbstractSeparatorNameSplitter(object):
 
     def split(self, name):
         parts = re.split(self.separator, name)
-        return [" ".join(parts[:-1]), parts[-1]]
+        return [u" ".join(parts[:-1]), parts[-1]]
 
     def get_name(self, name):
         raise NotImplementedError("AbstractSeparatorNameSplitter is an abstract class!")

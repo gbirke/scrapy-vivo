@@ -140,7 +140,7 @@ class GesisSpider(Spider):
         if authors_and_year:
             # TODO Parse the new name format with lastname, firstname and firstname lastname, all mixed and separated by commas
             name_collection = NameCollection(LastnameFirstnameSplitter(",")) 
-            pub["author_names"] = name_collection.collect(matched.group(1), ";").get_names_list()
+            pub["author_names"] = name_collection.collect(matched.group(1), ";").get_names()
             pub["year"] = matched.group(2)
         # TODO remove author and year from text and assign it to title_and_source
         if re.search("Monographien|Forschungs- und Arbeitsberichte|Sonstige Ver.+ffentlichungen|Herausgeberwerke", publication_type):
