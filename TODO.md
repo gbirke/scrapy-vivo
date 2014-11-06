@@ -3,6 +3,7 @@
 - Bugfix GESIS Personen & Publikationen
 - Publikationen ZBW
 - RDF-Export Publikationen
+- Web of science button ausblenden
 - Zuordnung HIIG zu den 4 "Division"s, ausgehend von dem, was unterhalb der Personen-Fotos steht, Divisions müsssen noch Gescraped/Geparsed werden, das vor dem doppeltpunkt ist name/label der "DivisonRole"
 - Zuordnung Organisation und Abteilung GESIS - Zuordnung nach ähnlichem Mechanismus wie Department_Role.
 - Bilder von Personen scrapen und ablegen
